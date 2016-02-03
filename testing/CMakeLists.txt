@@ -2,7 +2,11 @@ project( catch_lnp )
 
 include_directories( "${CMAKE_CURRENT_SOURCE_DIR}/include" )
 
-set( SRC_SHARED shared/mod_activity.cpp shared/mod_crypto.cpp )
+set( SRC_SHARED 
+    shared/mod_crypto.cpp 
+    shared/mod_activity.cpp 
+    shared/mod_activity_log.cpp )
+
 set( SOURCES entry.cpp ${SRC_SHARED} )
 
 add_executable(  catch_lnp ${SOURCES} )
