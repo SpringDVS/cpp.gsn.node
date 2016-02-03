@@ -8,25 +8,29 @@
 class activity_log : log_utility
 {
 public:
-	typedef std::list<activity> activity_list;
+	typedef log_utility::value_type value_type;
+	typedef log_utility::container_type container_type;
 	typedef log_utility::header_type header_type;
-	typedef log_utility::log_type log_type;
 	
 public:
 	activity_log();
 	
 	// Database style interface
 	log_transaction begin_transaction();
+	bool transacting();
 
 protected:
-	header_type& header();
-	log_type& log();
-	void end_transaction();
+	
+	// Accessible to transaction object
+	header_type& header() override;
+	container_type& log() override;
+	void end_transaction() override;
 
 private:
 	log_header m_header;
 	std::mutex m_mutex;
-	activity_list m_log;
+	container_type m_log;
+	bool m_transacting;
 };
 
 #endif
