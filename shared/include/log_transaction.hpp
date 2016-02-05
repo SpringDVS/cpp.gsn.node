@@ -9,6 +9,10 @@ public:
 	typedef utility_type::header_type header_type;
 	typedef utility_type::value_type value_type;
 	
+	typedef utility_type::size_type size_type;
+	typedef utility_type::serial_type serial_type;
+	typedef utility_type::serial_ptr serial_ptr;
+	
 	typedef value_type& reference;
 	typedef const reference const_reference;
 
@@ -28,23 +32,37 @@ public:
 	void write_record(const_reference record);
 	const activity read_record(hash512 hash);
 	
-	const log_header& header();
+	const log_header& header() const;
 	
-	iterator begin();
-	const_iterator cbegin();
+	value_type generate_record(value_type::header_type& header);
+	value_type generate_record(value_type::header_type& header, std::string content);
 	
-	iterator end();
-	const_iterator cend();
+	value_type::header_type generate_header();
 	
-	reference front();
-	const_reference cfront();
+	serial_ptr serialise() const;
+	serial_ptr serialise_partial() const;
+		
+	const_iterator cbegin() const;
+	const_iterator cend() const;
 	
-	reference back();
-	const_reference cback();
+	const_reference cfront() const;
+	const_reference cback() const;
+	
+	size_type size() const;
+	
+	bool log_verification() const;
+	
+	bool head_verification(const_reference record) const;
+	bool verification_from(hash512 hash) const;
+
+	size_type log_size() const;
+	size_type log_size_partial() const;
+	
+	hash512 log_hash() const;
 
 private:
 
-	inline void is_valid() {
+	inline void is_valid() const {
 		if(!m_valid) throw transaction_invalid_state();
 	};
 
