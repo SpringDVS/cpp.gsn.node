@@ -103,3 +103,15 @@ TEST_CASE( "Test de/serialise", "[shared],[activity]" ) {
 		REQUIRE(checker.content() == act.content());
 	}
 }
+
+TEST_CASE( "Test rehashing", "[shared],[activity]" ) {
+	activity_m act, checker;
+	
+	char data[11] = "HelloWorld";
+	auto control = hash_sha512(data, 10);
+	
+	act.rehash(control);
+	
+	REQUIRE(act.header().hash != checker.header().hash);
+
+}
