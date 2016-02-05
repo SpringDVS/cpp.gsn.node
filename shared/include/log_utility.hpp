@@ -24,6 +24,9 @@ public:
 	typedef activity value_type;
 	typedef std::list<value_type> container_type;
 	typedef log_header header_type;
+	typedef std::size_t size_type;
+	typedef char serial_type;
+	typedef serial_type* serial_ptr;
 	
 
 protected:
