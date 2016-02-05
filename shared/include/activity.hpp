@@ -18,15 +18,15 @@ enum class activity_type
 struct activity_header  
 {
 	activity_header()
-		: hash{0}, timestamp(0)
-		, type(activity_type::undefined), msg_size(0)
-		, signature{0}
-	{ }
+	: hash({0}), timestamp(0)
+	, type(activity_type::undefined), msg_size(0)
+	, signature({0})
+	{ };
 
 	hash512			hash;
 	unix_timestamp	timestamp;
 	activity_type	type;
-	size_t			msg_size;
+	std::size_t		msg_size;
 	hash2048		signature;
 	
 };
@@ -69,9 +69,19 @@ public:
 	 * 
 	 * @param hdr
 	 * @param msg
-	 * @param link
+	 * @param salt
 	 */
 	activity(header_type hdr, content_type msg, const hash512& salt);
+	
+		/**
+	 * @brief Construct an activity linked into a log chain
+	 * 
+	 * This will generate a record against a record salt
+	 * 
+	 * @param hdr
+	 * @param salt
+	 */
+	activity(header_type hdr, const hash512& salt);
 	
 	/**
 	 * @brief Get a const reference of the activity header
@@ -141,12 +151,14 @@ public:
 	 */
 	void deserialise(const serial_ptr serial);
 
+	
+	void rehash(const hash512& salt);
 protected:
 	header_type	 m_header;
 	content_type m_msg_content;
 	
 	void partial_hash();
-	void linked_hash(const hash512& link);
+
 };
 
 inline unix_timestamp get_timestamp() {

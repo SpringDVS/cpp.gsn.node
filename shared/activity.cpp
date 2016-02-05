@@ -17,13 +17,19 @@ activity::activity(header_type hdr, content_type msg)
 	partial_hash();
 }
 
-activity::activity(header_type hdr, content_type msg, const hash512& link)
+activity::activity(header_type hdr, content_type msg, const hash512& salt)
 	: m_header(hdr), m_msg_content(msg)
 {
 	m_header.msg_size = m_msg_content.length();
-	linked_hash(link);
+	rehash(link);
 }
 
+activity::activity(header_type hdr, const hash512& salt)
+	: m_header(hdr), m_msg_content("")
+{
+	m_header.msg_size = m_msg_content.length();
+	rehash(link);
+}
 
 const activity::content_type& activity::content() const {
 	return m_msg_content;
@@ -76,7 +82,7 @@ void activity::partial_hash() {
 	delete ptr;
 }
 
-void activity::linked_hash(const hash512& salt) {
+void activity::rehash(const hash512& salt) {
 	m_header.hash = salt;
 	auto ptr = serialise();
 	m_header.hash = hash_sha512(ptr, size());
