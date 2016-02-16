@@ -30,15 +30,59 @@ public:
 	
 	log_transaction& operator=(log_transaction&& orig);
 	
+	/**
+	 * @brief Write a record to the back of the log
+	 * 
+	 * Write a pre-generated record to the end of the log
+	 * and rehash the header of the log.
+	 * 
+	 * This 
+	 * 
+	 * @param record a const reference to the record to add
+	 * @throws transaction_invalid_state
+	 */
 	void write_record(const_reference record);
+	
+	/**
+	 * @brief Write another log's segment to the end of of this log
+	 * 
+	 * This will push all the entries in the segment onto this
+	 * log and finally rehash the log
+	 * 
+	 * @note This needs to rollback
+	 * @param segment A reference to a log_segment
+	 * @throws transaction_invalid_state
+	 */
 	void write_segment(log_segment& segment);
+	
+	/**
+	 * @brief Read record with specified hash
+	 * @param hash The 512bit hash of the record to read
+	 * @return record of the activity
+	 * @throws transaction_invalid_state, transaction_read_fail
+	 */
 	const activity read_record(hash512 hash);
 	
+	/**
+	 * @brief get header of the log
+	 * @return const reference to the header
+	 */
 	const log_header& header() const;
 	
 	value_type generate_record(value_type::header_type& header);
 	value_type generate_record(value_type::header_type& header, std::string content);
 	
+	/**
+	 * @brief Generate a segment from hash
+	 * 
+	 * Create a log segment that starts the specified hash but does *not*
+	 * include the specified hash.
+	 * 
+	 * If hash does not exist, it will throw
+	 * 
+	 * @return log_segment object
+	 * @throws transaction_invalid_state, transaction_read_fail
+	 */
 	log_segment segment_from(hash512 hash);
 	
 	value_type::header_type generate_header();
@@ -52,8 +96,8 @@ public:
 	const_iterator cend() const;
 	const_iterator end() const;
 	
-	const_reference cfront() const;
-	const_reference cback() const;
+	const_reference front() const;
+	const_reference back() const;
 	
 	size_type size() const;
 	

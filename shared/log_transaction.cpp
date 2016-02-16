@@ -67,6 +67,7 @@ log_transaction::const_iterator log_transaction::cbegin() const {
 	is_valid();
 	return m_log.cbegin();
 }
+
 log_transaction::const_iterator log_transaction::begin() const {
 	is_valid();
 	return m_log.cbegin();
@@ -82,12 +83,12 @@ log_transaction::const_iterator log_transaction::end() const {
 	return m_log.cend();
 }
 
-log_transaction::const_reference log_transaction::cback() const {
+log_transaction::const_reference log_transaction::back() const {
 	is_valid();
 	return m_log.back();
 }
 
-log_transaction::const_reference log_transaction::cfront() const {
+log_transaction::const_reference log_transaction::front() const {
 	is_valid();
 	return m_log.front();
 }
@@ -101,13 +102,13 @@ log_transaction::value_type log_transaction::generate_record(value_type::header_
 	is_valid();
 	if(!size()) return value_type(header);
 	
-	return value_type(header, cback().header().hash);
+	return value_type(header, back().header().hash);
 }
 
 log_transaction::value_type log_transaction::generate_record(value_type::header_type& header, std::string content) {
 	is_valid();
 	if(!size()) return value_type(header, content);
-	return value_type(header, content, cback().header().hash);
+	return value_type(header, content, back().header().hash);
 }
 
 log_transaction::size_type log_transaction::size() const {
@@ -143,7 +144,7 @@ bool log_transaction::log_verification() const {
 bool log_transaction::head_verification(const_reference record) const {
 	is_valid();
 	
-	auto check = value_type(record.header(), record.content(), cback().header().hash);
+	auto check = value_type(record.header(), record.content(), back().header().hash);
 	return check.header().hash == record.header().hash;
 }
 
@@ -154,6 +155,7 @@ bool log_transaction::verification_from(hash512 hash) const {
 }
 
 log_transaction::serial_ptr log_transaction::serialise() const {
+	is_valid();
 	auto hdr_ptr = reinterpret_cast<serial_ptr>(&m_header);
 	auto hdr_sz = sizeof(log_header);
 	
@@ -174,6 +176,7 @@ log_transaction::serial_ptr log_transaction::serialise() const {
 }
 
 log_transaction::serial_ptr log_transaction::serialise_partial() const {
+	is_valid();
 	auto heap = new serial_type[log_size_partial()];
 	auto ptr = heap;
 	for(auto& r : m_log) {
@@ -187,6 +190,7 @@ log_transaction::serial_ptr log_transaction::serialise_partial() const {
 }
 
 hash512 log_transaction::log_hash() const {
+	is_valid();
 	auto serial = serialise_partial();
 	auto hash = hash_sha512(serial, log_size_partial());
 	delete serial;
@@ -194,6 +198,7 @@ hash512 log_transaction::log_hash() const {
 }
 
 log_segment log_transaction::segment_from(hash512 hash) {
+	is_valid();
 	auto inc = false;
 	log_type c;
 	
