@@ -4,13 +4,14 @@
 
 struct activity_header_m : public activity_header
 {
+public:
 	activity_header_m() {
 		char data[11] = "HelloWorld";
 		hash = std::move(hash_sha512(data, 10));
 		timestamp = get_timestamp();
 		signature[4] = 21;
 		msg_size = 0;
-		type = activity_type::root_verify;	
+		type = activity_type::root_verify;
 	}
 	
 };
