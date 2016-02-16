@@ -21,14 +21,14 @@ activity::activity(header_type hdr, content_type msg, const hash512& salt)
 	: m_header(hdr), m_msg_content(msg)
 {
 	m_header.msg_size = m_msg_content.length();
-	rehash(link);
+	rehash(salt);
 }
 
 activity::activity(header_type hdr, const hash512& salt)
 	: m_header(hdr), m_msg_content("")
 {
 	m_header.msg_size = m_msg_content.length();
-	rehash(link);
+	rehash(salt);
 }
 
 const activity::content_type& activity::content() const {
