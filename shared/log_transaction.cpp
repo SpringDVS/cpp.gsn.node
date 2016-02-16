@@ -45,6 +45,17 @@ void log_transaction::write_record(const_reference record) {
 	is_valid();
 	m_log.push_back(record);
 	m_header.hash = log_hash();
+	m_header.num_records++;
+}
+
+void log_transaction::write_segment(log_segment& segment) {
+	is_valid();
+	for(auto& r : segment) {
+		m_log.push_back(r);
+		m_header.num_records++;
+	}
+	
+	rewrite_log_hash();
 }
 
 const log_header& log_transaction::header() const {
@@ -56,8 +67,17 @@ log_transaction::const_iterator log_transaction::cbegin() const {
 	is_valid();
 	return m_log.cbegin();
 }
+log_transaction::const_iterator log_transaction::begin() const {
+	is_valid();
+	return m_log.cbegin();
+}
 
 log_transaction::const_iterator log_transaction::cend() const {
+	is_valid();
+	return m_log.cend();
+}
+
+log_transaction::const_iterator log_transaction::end() const {
 	is_valid();
 	return m_log.cend();
 }
@@ -96,6 +116,7 @@ log_transaction::size_type log_transaction::size() const {
 }
 
 log_transaction::size_type log_transaction::log_size() const {
+	is_valid();
 	size_type sz = sizeof(log_header);
 	for(auto& r : m_log) {
 		sz += r.size();
@@ -104,6 +125,7 @@ log_transaction::size_type log_transaction::log_size() const {
 }
 
 log_transaction::size_type log_transaction::log_size_partial() const {
+	is_valid();
 	size_type sz = 0;
 	for(auto& r : m_log) {
 		sz += r.size();
@@ -152,8 +174,7 @@ log_transaction::serial_ptr log_transaction::serialise() const {
 }
 
 log_transaction::serial_ptr log_transaction::serialise_partial() const {
-auto heap = new serial_type[log_size_partial()];
-
+	auto heap = new serial_type[log_size_partial()];
 	auto ptr = heap;
 	for(auto& r : m_log) {
 		auto s = r.serialise();
@@ -172,4 +193,21 @@ hash512 log_transaction::log_hash() const {
 	return hash;
 }
 
+log_segment log_transaction::segment_from(hash512 hash) {
+	auto inc = false;
+	log_type c;
+	
+	for(const auto& r : m_log) {
+		if(inc) c.push_back(r);
+		if(r.header().hash == hash) inc = true;
+	}
+	
+	if(!inc) throw transaction_read_fail("Record does not exist");
+	
+	return log_segment(m_header.hash, std::move(c));
+}
+
+void log_transaction::rewrite_log_hash() {
+	m_header.hash = log_hash();
+}
 
