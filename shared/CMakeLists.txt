@@ -1,5 +1,6 @@
 project( lowland )
-set( SOURCES crypto.cpp activity.cpp log_transaction.cpp activity_log.cpp )
+set( SOURCES crypto.cpp activity.cpp log_transaction.cpp activity_log.cpp 
+        log_segment.cpp)
 
 add_library( lowland SHARED ${SOURCES} )
 target_link_libraries( lowland ssl crypto )
