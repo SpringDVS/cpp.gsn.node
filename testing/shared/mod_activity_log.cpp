@@ -193,9 +193,10 @@ TEST_CASE("Test inserting segment", "[shared],[activity_log],[log_transaction],[
 	}
 	
 	SECTION("Actual insertion and verification") {
-		auto segment = tc.segment_from(tp.cback().header().hash);
+		auto segment = tc.segment_from(tp.back().header().hash);
 		tp.write_segment(segment);
 		REQUIRE(tp.header().hash == tc.header().hash);
+		REQUIRE(tp.header().hash == segment.header().hash);
 		REQUIRE(tp.header().num_records == tc.header().num_records);
 	}
 }
