@@ -13,7 +13,7 @@
 
 #ifndef ACTIVITY_LOG_M_HPP
 #define ACTIVITY_LOG_M_HPP
-#include "activity_log.hpp"
+#include "activity/activity_log.hpp"
 class activity_log_m : public activity_log 
 {
 public:

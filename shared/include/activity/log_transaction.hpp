@@ -1,7 +1,7 @@
 #ifndef LOG_TRANSACTION_HPP
 #define LOG_TRANSACTION_HPP
-#include "log_utility.hpp"
-#include "log_segment.hpp"
+#include "activity/log_utility.hpp"
+#include "activity/log_segment.hpp"
 
 class log_transaction {
 public:

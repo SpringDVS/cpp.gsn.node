@@ -4,7 +4,7 @@
 #include <atomic>
 #include <list>
 
-#include "activity.hpp"
+#include "activity/activity.hpp"
 
 
 struct log_header {

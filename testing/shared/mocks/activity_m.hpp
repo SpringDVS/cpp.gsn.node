@@ -14,6 +14,7 @@
 #ifndef ACTIVITY_M_HPP
 #define ACTIVITY_M_HPP
 #include "activity_header_m.hpp"
+
 class activity_m : public activity
 {
 public:

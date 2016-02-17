@@ -1,4 +1,4 @@
-#include "log_transaction.hpp"
+#include "activity/log_transaction.hpp"
 
 log_transaction::log_transaction(utility_type& base)
 	: m_base(base)

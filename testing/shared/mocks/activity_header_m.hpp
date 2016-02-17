@@ -1,6 +1,6 @@
 #ifndef MOCK_ACTIVITY_HEADER_HPP
 #define MOCK_ACTIVITY_HEADER_HPP
-#include "activity.hpp"
+#include "activity/activity.hpp"
 
 struct activity_header_m : public activity_header
 {

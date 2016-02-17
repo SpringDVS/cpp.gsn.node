@@ -1,5 +1,5 @@
 #include "catch.hpp"
-#include "activity.hpp"
+#include "activity/activity.hpp"
 #include "mocks/activity_m.hpp"
 
 TEST_CASE( "Test ctors", "[shared],[activity]" ) {

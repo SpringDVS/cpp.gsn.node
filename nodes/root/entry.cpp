@@ -1,7 +1,7 @@
 #include <iostream>
 #include <chrono>
 
-#include "activity.hpp"
+#include "activity/activity.hpp"
 
 using namespace std::chrono;
 int main() {

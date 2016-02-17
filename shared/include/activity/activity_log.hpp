@@ -2,7 +2,7 @@
 #define ACTIVITY_LOG_HPP
 
 #include <mutex>
-#include "log_transaction.hpp"
+#include "activity/log_transaction.hpp"
 
 
 class activity_log : log_utility

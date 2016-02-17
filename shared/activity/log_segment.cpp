@@ -1,5 +1,5 @@
-#include "log_utility.hpp"
-#include "log_segment.hpp"
+#include "activity/log_utility.hpp"
+#include "activity/log_segment.hpp"
 
 log_segment::log_segment(hash512 hash, container_type&& segment) {
     m_header.hash = hash;

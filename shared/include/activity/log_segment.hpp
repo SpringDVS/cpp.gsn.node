@@ -1,7 +1,7 @@
 #ifndef LOG_SEGMENT_HPP
 #define LOG_SEGMENT_HPP
 
-#include "log_utility.hpp"
+#include "activity/log_utility.hpp"
 
 
 class log_segment {

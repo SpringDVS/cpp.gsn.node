@@ -1,4 +1,4 @@
-#include "activity.hpp"
+#include "activity/activity.hpp"
 
 activity::activity()
 	: m_header(), m_msg_content("")

@@ -1,6 +1,6 @@
 #include "catch.hpp"
-#include "activity_log.hpp"
-#include "log_segment.hpp"
+#include "activity/activity_log.hpp"
+#include "activity/log_segment.hpp"
 #include "mocks/activity_m.hpp"
 #include "mocks/activity_log_m.hpp"
 

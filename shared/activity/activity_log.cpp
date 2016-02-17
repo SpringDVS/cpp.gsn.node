@@ -1,4 +1,4 @@
-#include "activity_log.hpp"
+#include "activity/activity_log.hpp"
 
 activity_log::activity_log()
 	: m_header()
