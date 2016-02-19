@@ -43,5 +43,13 @@ public:
 	: exception_base(m)
 	{ }
 };
+
+class netspace_invalid_addr : public exception_base
+{
+public:
+	netspace_invalid_addr(const std::string& m)
+	: exception_base(m)
+	{ }
+};
 #endif /* EXCEPTIONS_HPP */
 
