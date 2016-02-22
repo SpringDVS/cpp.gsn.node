@@ -51,5 +51,14 @@ public:
 	: exception_base(m)
 	{ }
 };
+
+class netspace_malformed_url : public exception_base 
+{
+public:
+	netspace_malformed_url() 
+	: exception_base("Bad URL") 
+	{ }
+
+};
 #endif /* EXCEPTIONS_HPP */
 

@@ -8,6 +8,7 @@ set( SOURCES
 
         infrastructure/netnode.cpp
         infrastructure/netspace_table.cpp
+        infrastructure/netspace_url.cpp
 )
 
 add_library( springdvs SHARED ${SOURCES} )

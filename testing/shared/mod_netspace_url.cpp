@@ -5,41 +5,96 @@
  */
 #include <iostream>
 #include "catch.hpp"
-#include "infrastructure/netnode.hpp"
-TEST_CASE( "Test netnode ctors", "[shared],[netnode]" ) {
-	SECTION("default") {
-		auto node = netnode();
-		REQUIRE(node.type() == netnode_type::undefined);
-		REQUIRE(node.address() == netspace_addr());
-		REQUIRE(node.hostname() == std::string());
+#include "infrastructure/netspace_url.hpp"
+TEST_CASE( "Test netspaced_url ctors", "[shared],[netspace_url]" ) {
+
+	SECTION("Fail") {
+		REQUIRE_THROWS_AS(netspace_url("srp://org.nn"), netspace_malformed_url);
+		REQUIRE_THROWS_AS(netspace_url(""), netspace_malformed_url);
+	}
+
+	SECTION("gsn") {
+		netspace_url url;
+		REQUIRE_NOTHROW(url = netspace_url("spring://org.nn"));
+		auto gsn = url.static_route();
+		REQUIRE(gsn.size() == 2);
+		REQUIRE(gsn[0] == "org");
+		REQUIRE(gsn[1] == "nn");
+		REQUIRE(url.national_network() == "nn");
 	}
 	
-	SECTION("Typed") {
-		auto node = netnode(netnode_type::root);
-		REQUIRE(node.type() == netnode_type::root);
-		REQUIRE(node.address() == netspace_addr());
-		REQUIRE(node.hostname() == std::string());
+	SECTION("gsn:glq") {
+		netspace_url url;
+		REQUIRE_NOTHROW(url = netspace_url("spring://org.nn:gsquery"));
+		auto gsn = url.static_route();
+		REQUIRE(gsn.size() == 2);
+		REQUIRE(gsn[0] == "org");
+		REQUIRE(gsn[1] == "nn");
+		REQUIRE(url.geosub_query() == "gsquery");
+		REQUIRE(url.national_network() == "nn");
+	}
+
+	SECTION("gsn/res") {
+		netspace_url url;
+		REQUIRE_NOTHROW(url = netspace_url("spring://org.gsn.nn/resource"));
+		auto gsn = url.static_route();
+		REQUIRE(gsn.size() == 3);
+		REQUIRE(gsn[0] == "org");
+		REQUIRE(gsn[1] == "gsn");
+		REQUIRE(gsn[2] == "nn");
+		REQUIRE(url.resource() == "resource");
+		REQUIRE(url.national_network() == "nn");
+	}
+
+	SECTION("gsn?query") {
+		netspace_url url;
+		REQUIRE_NOTHROW(url = netspace_url("spring://org.gsn.nn?query"));
+		auto gsn = url.static_route();
+		REQUIRE(gsn.size() == 3);
+		REQUIRE(gsn[0] == "org");
+		REQUIRE(gsn[1] == "gsn");
+		REQUIRE(gsn[2] == "nn");
+		REQUIRE(url.query() == "query");
+		REQUIRE(url.national_network() == "nn");
+	}
+
+	SECTION("gsn:glq?query") {
+		netspace_url url;
+		REQUIRE_NOTHROW(url = netspace_url("spring://org.gsn.nn:glq?query"));
+		auto gsn = url.static_route();
+		REQUIRE(gsn.size() == 3);
+		REQUIRE(gsn[0] == "org");
+		REQUIRE(gsn[1] == "gsn");
+		REQUIRE(gsn[2] == "nn");
+		REQUIRE(url.geosub_query() == "glq");
+		REQUIRE(url.query() == "query");
+		REQUIRE(url.national_network() == "nn");
+	}
+
+	SECTION("gsn:glq/res") {
+		netspace_url url;
+		REQUIRE_NOTHROW(url = netspace_url("spring://org.gsn.nn:glq/resource"));
+		auto gsn = url.static_route();
+		REQUIRE(gsn.size() == 3);
+		REQUIRE(gsn[0] == "org");
+		REQUIRE(gsn[1] == "gsn");
+		REQUIRE(gsn[2] == "nn");
+		REQUIRE(url.geosub_query() == "glq");
+		REQUIRE(url.resource() == "resource");
+		REQUIRE(url.national_network() == "nn");
 	}
 	
-	SECTION("Type, String, String") {
-		auto node = netnode(netnode_type::root, 
-							"root_node", 
-							"192.168.1.1");
-		
-		
-		REQUIRE(node.type() == netnode_type::root);
-		REQUIRE(node.address() == netspace_addr::from_string("192.168.1.1"));
-		REQUIRE(node.hostname() == std::string("root_node"));
-	}
-	
-	SECTION("Type, String, netspace_addr") {
-		auto node = netnode(netnode_type::root, 
-							"root_node", 
-							netspace_addr::from_string("192.168.1.1"));
-		
-		
-		REQUIRE(node.type() == netnode_type::root);
-		REQUIRE(node.address() == netspace_addr::from_string("192.168.1.1"));
-		REQUIRE(node.hostname() == std::string("root_node"));
+	SECTION("gsn:glq/res?query") {
+		netspace_url url;
+		REQUIRE_NOTHROW(url = netspace_url("spring://org.gsn.nn:glq/resource?query"));
+		auto gsn = url.static_route();
+		REQUIRE(gsn.size() == 3);
+		REQUIRE(gsn[0] == "org");
+		REQUIRE(gsn[1] == "gsn");
+		REQUIRE(gsn[2] == "nn");
+		REQUIRE(url.geosub_query() == "glq");
+		REQUIRE(url.query() == "query");
+		REQUIRE(url.resource() == "resource");
+		REQUIRE(url.national_network() == "nn");
 	}
 }

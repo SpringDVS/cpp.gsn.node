@@ -21,9 +21,9 @@ public:
 	cmpt_glq geosub_query();
 	cmpt_nn national_network();
 	cmpt_res resource();
-	std::string url();
 	std::string query();
 
+	std::string url();
 private:
 	std::string m_url;
 	cmpt_gsn m_gsn;
