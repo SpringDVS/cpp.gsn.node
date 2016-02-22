@@ -37,13 +37,19 @@ public:
 	void clear();
 	
 	template<typename T>
-	void copy_content(T& data, size_type size) noexcept;
+	void copy_content(const T* data, size_type size) noexcept {
+		reset(size);
+
+		auto s = reinterpret_cast<const generic_type*>(data);
+		std::copy(s, s+size, m_content);
+	};
+	
 	void str_content(std::string data) noexcept;
 	
 	const generic_type& content() const;
 	std::string to_string() const;
 	
-	serial_ptr serialise() const noexcept;
+	serial_ptr serialise() const;
 
 private:
 	dvsp_header m_header;

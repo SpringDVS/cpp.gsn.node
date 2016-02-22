@@ -35,6 +35,34 @@ TEST_CASE("Modification of dvsp_packet", "[shared],[dvsp_packet]") {
 	*/
 }
 
+struct bin_data {
+	std::uint64_t ui64;
+	long long ul;
+	std::uint8_t ui8;
+};
+
+TEST_CASE("Add binary content to dvsp_packet", "[shared],[dvsp_packet]") {
+
+	
+	bin_data bd;
+	bd.ui64 = 342237;
+	bd.ul = 123.32;
+	bd.ui8 = 67;
+	
+	dvsp_packet p;
+	p.copy_content(&bd, sizeof(bin_data));
+	REQUIRE(p.header().size > 0);
+	auto bdc = reinterpret_cast<const bin_data&>(p.content());
+	REQUIRE(bdc.ui64 == bd.ui64);
+	REQUIRE(bdc.ul == bd.ul);
+	REQUIRE(bdc.ui8 == bd.ui8);
+}
+
+TEST_CASE("Empty Content", "[shared],[dvsp_packet]") {
+	dvsp_packet p;
+	REQUIRE_THROWS_AS(p.content(), dvsp_empty_content);
+	REQUIRE_THROWS_AS(p.to_string(), dvsp_empty_content);
+}
 TEST_CASE("De/Serialise dvsp_packet", "[shared],[dvsp_packet]") {
 	dvsp_packet p;
 	p.header().addr_dest = netspace_ipv4{192,168,0,1};

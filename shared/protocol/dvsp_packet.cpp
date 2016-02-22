@@ -23,15 +23,6 @@ void dvsp_packet::clear() {
 	reset(0);
 }
 
-
-template<typename T>
-void dvsp_packet::copy_content(T& data, size_type size) noexcept {
-	reset(size);
-	
-	auto s = reinterpret_cast<generic_type*>(data);
-	std::copy(s, s+size, m_content);
-}
-
 void dvsp_packet::str_content(std::string data) noexcept {
 	reset(data.length());
 	
@@ -59,7 +50,8 @@ const dvsp_header& dvsp_packet::header() const noexcept {
 	return m_header;
 }
 
-dvsp_packet::serial_ptr dvsp_packet::serialise() const noexcept{
+dvsp_packet::serial_ptr dvsp_packet::serialise() const{
+	if(m_header.size && !m_content) throw dvsp_empty_content();
 	auto hdr_sz = sizeof(dvsp_header);
 	auto hdr_ptr = reinterpret_cast<const serial_type*>(&m_header);
 	auto serial = new serial_type[hdr_sz + m_header.size];
