@@ -18,6 +18,12 @@
 #include "common.hpp"
 
 using netspace_addr = boost::asio::ip::address;
+using netspace_ipv4 = std::array<std::uint8_t, 4>;
+using netspace_tcp = boost::asio::ip::tcp;
+using netspace_ios = boost::asio::io_service;
+
+#define NS_PORT 55400
+
 
 #endif /* NET_COMMON_HPP */
 
