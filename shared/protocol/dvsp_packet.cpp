@@ -30,12 +30,17 @@ void dvsp_packet::str_content(std::string data) noexcept {
 }
 
 const dvsp_packet::generic_type& dvsp_packet::content() const {
-	if(!m_header.size) throw dvsp_empty_content();
+	if(!m_header.size
+	|| (m_header.size && !m_content ) )
+		throw dvsp_empty_content();
+
 	return *m_content;
 }
 
 std::string dvsp_packet::to_string() const {
-	if(!m_header.size) throw dvsp_empty_content();
+	if(!m_header.size
+	|| (m_header.size && !m_content ) )
+		throw dvsp_empty_content();
 	std::string s;
 	s.assign(reinterpret_cast<const char*>(m_content), m_header.size);
 	return s;
