@@ -21,6 +21,9 @@ class dvsp_packet
 public:
 	typedef char serial_type;
 	typedef serial_type* serial_ptr;
+	typedef char generic_type;
+	typedef generic_type* generic_ptr;
+	typedef std::size_t size_type;
 	
 public:
 	dvsp_packet();
@@ -31,16 +34,32 @@ public:
 	dvsp_header& header() noexcept;
 	const dvsp_header& header() const noexcept;
 	
-	std::string& content() noexcept;
-	const std::string& content() const noexcept;
+	void clear();
+	
+	template<typename T>
+	void copy_content(T& data, size_type size) noexcept;
+	void str_content(std::string data) noexcept;
+	
+	const generic_type& content() const;
+	std::string to_string() const;
 	
 	serial_ptr serialise() const noexcept;
 
 private:
 	dvsp_header m_header;
-	std::string m_content;
+	generic_ptr m_content;
 	
 	void deserialise(const serial_ptr serial) noexcept;
+	inline void reset(size_type size) {
+		if(m_content) delete[] m_content;
+		m_header.size = size;
+		
+		if(!size) return;
+		
+		m_content = new generic_type[size];
+		
+			
+	};
 
 };
 

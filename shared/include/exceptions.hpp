@@ -60,5 +60,14 @@ public:
 	{ }
 
 };
+
+class dvsp_empty_content : public exception_base 
+{
+public:
+	dvsp_empty_content() 
+	: exception_base("Empty Packet Content") 
+	{ }
+
+};
 #endif /* EXCEPTIONS_HPP */
 
