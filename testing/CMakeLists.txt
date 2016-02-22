@@ -6,11 +6,16 @@ set( SRC_SHARED
     shared/mod_crypto.cpp 
     shared/mod_activity.cpp 
     shared/mod_activity_log.cpp
+    shared/mod_netspace_url.cpp
     shared/mod_netnode.cpp 
     shared/mod_netspace_table.cpp
+    shared/mod_dvsp_packet.cpp
 )
 
-set( SOURCES entry.cpp ${SRC_SHARED} )
+set( SRC_NODES
+    nodes/root/mod_node_root.cpp 
+)
+set( SOURCES entry.cpp ${SRC_SHARED} ${SRC_NODES} )
 
 add_executable(  catch_lnp ${SOURCES} )
 target_link_libraries( catch_lnp springdvs )
