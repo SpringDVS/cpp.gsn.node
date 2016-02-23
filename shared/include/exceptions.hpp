@@ -2,8 +2,7 @@
 #define EXCEPTIONS_HPP
 
 #include <exception>
-
-
+#include <string>
 class exception_base : std::exception 
 {
 public:	
@@ -17,57 +16,35 @@ private:
 	const std::string& m_msg;
 };
 
-class transaction_invalid_state : public exception_base 
-{
-public:
-	transaction_invalid_state() 
-	: exception_base("Transaction object in invalid state")
-	{ }
 
-private:
-		
-};
 
-class transaction_read_fail : public exception_base 
-{
-public:
-	transaction_read_fail(const std::string& m)
-	: exception_base(m)
-	{ }
-};
+#define EXCEPTION(ename)						\
+class ename : public exception_base				\
+{												\
+public:											\
+	ename(const std::string& m)					\
+	: exception_base(m)							\
+	{ }											\
+}
 
-class transaction_write_fail : public exception_base 
-{
-public:
-	transaction_write_fail(const std::string& m)
-	: exception_base(m)
-	{ }
-};
+#define EXCEPTION_STATIC(ename, msg)			\
+class ename : public exception_base				\
+{												\
+public:											\
+	ename()										\
+	: exception_base(msg)						\
+	{ }											\
+}
 
-class netspace_invalid_addr : public exception_base
-{
-public:
-	netspace_invalid_addr(const std::string& m)
-	: exception_base(m)
-	{ }
-};
+EXCEPTION_STATIC(transaction_invalid_state, "Transaction object in invalid state");
+EXCEPTION(transaction_read_fail);
+EXCEPTION(transaction_write_fail);
+EXCEPTION(netspace_invalid_addr);
+EXCEPTION_STATIC(netspace_malformed_url, "Bad URL");
+EXCEPTION(metaspace_db_fail);
+EXCEPTION(metaspace_query_fail);
+EXCEPTION(metaspace_query_noresult);
+EXCEPTION_STATIC(dvsp_empty_content, "Empty packet content");
 
-class netspace_malformed_url : public exception_base 
-{
-public:
-	netspace_malformed_url() 
-	: exception_base("Bad URL") 
-	{ }
-
-};
-
-class dvsp_empty_content : public exception_base 
-{
-public:
-	dvsp_empty_content() 
-	: exception_base("Empty Packet Content") 
-	{ }
-
-};
 #endif /* EXCEPTIONS_HPP */
 
