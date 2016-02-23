@@ -70,6 +70,9 @@ void dvsp_packet::deserialise(const serial_ptr serial) noexcept {
 	auto hdr_ptr = reinterpret_cast<const dvsp_header*>(serial);
 	std::copy(hdr_ptr, hdr_ptr+1, &m_header);
 	reset(m_header.size);
+	
+	if(!m_header.size) return;
+	
 	auto data_ptr = serial+sizeof(dvsp_header);
 	std::copy(data_ptr, data_ptr+m_header.size, m_content);
 }

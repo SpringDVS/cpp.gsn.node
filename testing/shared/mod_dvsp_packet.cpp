@@ -61,12 +61,12 @@ TEST_CASE("Add binary content to dvsp_packet", "[shared],[dvsp_packet]") {
 TEST_CASE("Empty Content", "[shared],[dvsp_packet]") {
 	
 	dvsp_packet p;
-	SECTION("Content accessors") {
+	SECTION("Content accessors with zero size") {
 		REQUIRE_THROWS_AS(p.content(), dvsp_empty_content);
 		REQUIRE_THROWS_AS(p.to_string(), dvsp_empty_content);
 	}
 	
-	SECTION("Serialise with invalid header size") {
+	SECTION("Content access and serialise with invalid header size") {
 		p.header().size = 1024;
 		REQUIRE_THROWS_AS(p.serialise(), dvsp_empty_content);
 		REQUIRE_THROWS_AS(p.content(), dvsp_empty_content);

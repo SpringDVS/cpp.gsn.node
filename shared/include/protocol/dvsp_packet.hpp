@@ -4,12 +4,14 @@
 
 struct dvsp_header {
 	dvsp_msgtype type;
+	bool part;
 	std::uint32_t size;
 	netspace_ipv4 addr_orig;
 	netspace_ipv4 addr_dest;
 	
 	dvsp_header()
 		: type(dvsp_msgtype::undefined)
+		, part(false)
 		, size(0)
 		, addr_orig{0}
 		, addr_dest{0}

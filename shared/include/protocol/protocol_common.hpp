@@ -12,6 +12,7 @@ enum class dvsp_msgtype : char {
 
 	gsn_request,
 	gsn_response,
+	gsn_payload,
 
 	gtn_root_nodes,
 
