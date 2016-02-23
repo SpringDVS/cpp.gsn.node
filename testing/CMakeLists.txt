@@ -9,6 +9,7 @@ set( SRC_SHARED
     shared/mod_netspace_url.cpp
     shared/mod_netnode.cpp 
     shared/mod_netspace_table.cpp
+    shared/mod_metaspace_gsn.cpp
     shared/mod_dvsp_packet.cpp
 )
 
