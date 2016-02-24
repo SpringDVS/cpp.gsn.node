@@ -15,9 +15,6 @@
 #define NETNODE_HPP
 #include "infrastructure/net_common.hpp"
 
-enum class netnode_type : int {
-	undefined, root, org, trusted, georoot
-};
 
 class netnode {
 	
