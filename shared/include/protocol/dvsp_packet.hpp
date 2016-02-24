@@ -41,7 +41,6 @@ public:
 	template<typename T>
 	void copy_content(const T* data, size_type size) noexcept {
 		reset(size);
-
 		auto s = reinterpret_cast<const generic_type*>(data);
 		std::copy(s, s+size, m_content);
 	};
@@ -49,6 +48,12 @@ public:
 	void str_content(std::string data) noexcept;
 	
 	const generic_type& content() const;
+	
+	template<class T>
+	const T& content_as() const {
+		return reinterpret_cast<const T&>(*m_content);
+	};
+	
 	std::string to_string() const;
 	
 	serial_ptr serialise() const;
@@ -71,5 +76,6 @@ private:
 
 };
 
+using packet_uptr = std::unique_ptr<dvsp_packet>;
 #endif /* DVSP_PACKET_HPP */
 
