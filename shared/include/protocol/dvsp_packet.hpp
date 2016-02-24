@@ -18,6 +18,16 @@ struct dvsp_header {
 		{ }
 };
 
+inline std::string ns_ipv4_str(const netspace_ipv4& addr) {
+	std::stringstream ss;
+	ss	<< std::to_string(addr[0]) 
+		<< "." << std::to_string(addr[1]) 
+		<< "." << std::to_string(addr[2])
+		<< "." << std::to_string(addr[3]);
+	
+	return ss.str();
+}
+
 class dvsp_packet
 {
 public:
