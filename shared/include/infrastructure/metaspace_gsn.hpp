@@ -1,7 +1,9 @@
 #ifndef METASPACE_GSN_HPP
 #define METASPACE_GSN_HPP
 
+#include <mutex>
 #include <sqlite3.h>
+
 #include "common.hpp"
 
 class metaspace_gsn {
@@ -16,6 +18,7 @@ public:
 private:
 	std::string from_outcode(const std::string& outcode);
 	std::string from_county(const std::string& county);
+	std::mutex m_mutex;
 	sqlite3 *m_db;
 };
 

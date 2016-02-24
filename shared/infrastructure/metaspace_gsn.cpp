@@ -13,7 +13,6 @@
 
 #include <boost/regex.hpp>
 
-
 #include "infrastructure/metaspace_gsn.hpp"
 
 
@@ -31,10 +30,11 @@ metaspace_gsn::~metaspace_gsn() {
 }
 
 std::string metaspace_gsn::resolve_gsn(const std::string& query) {
+	
 	if(!query.length()) throw metaspace_query_fail("Empty query");
 	
 	std::string outcode;
-	
+	std::lock_guard<std::mutex> lock(m_mutex);
 	if(has_outcode(query, outcode)) {
 		return from_outcode(outcode);
 	}
