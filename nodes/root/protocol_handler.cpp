@@ -26,13 +26,13 @@ packet_uptr protocol_handler::process_packet(const dvsp_packet& packet, const ne
 }
 
 packet_uptr protocol_handler::register_host(const dvsp_packet& packet, const netspace_addr& addr) {
-	
-	if(m_nstable.find_addr(addr.to_string()) != m_nstable.end())
-		return response(addr, 101); // Table error
-	
+
 	// GSN management should not hop
 	if(addr.to_v4().to_bytes() != packet.header().addr_orig)
 		return response(addr, 102); // Network error
+	
+	if(m_nstable.find_addr(addr.to_string()) != m_nstable.end())
+		return response(addr, 101); // Table error
 
 	auto st = reinterpret_cast<const frame_register&>(packet.content());
 	
@@ -51,10 +51,13 @@ packet_uptr protocol_handler::register_host(const dvsp_packet& packet, const net
 packet_uptr protocol_handler::unregister_host(const dvsp_packet& packet, const netspace_addr& addr) {
 	// GSN management should not hop
 	if(addr.to_v4().to_bytes() != packet.header().addr_orig)
-		return response(addr, 101);
+		return response(addr, 102); // Network error
 
-	if(m_nstable.find_addr(addr.to_string()) == m_nstable.end())
-		return response(addr, 101);
+	auto it = m_nstable.find_addr(addr.to_string());
+	if(it == m_nstable.end())
+		return response(addr, 101); // Table error
+	
+	m_nstable.erase_node(it);
 	return response(addr, 200);
 }
 

@@ -81,3 +81,48 @@ TEST_CASE("Test protocol_handler register (dynamic tables)", "[node],[root],[pro
 		REQUIRE(out->content_as<frame_response_code>().response == 102);
 	}
 }
+
+TEST_CASE("Test protocol_handler uregister (dynamic tables)", "[node],[root],[protocol]") {
+	netspace_table nstable;
+	metaspace_gsn msgsn;
+	protocol_handler proto(nstable, msgsn);
+	
+	nstable.add_node(netnode(netnode_type::org, "dvs.test", "192.168.1.2"));
+	nstable.add_node(netnode(netnode_type::org, "dvs.test2", "192.168.1.3"));
+	auto addr = netspace_addr::from_string("192.168.1.2");
+	
+
+	SECTION("Successful unregistration") {
+		REQUIRE(nstable.size() == 2); // Sanity
+		auto in = packet_of(dvsp_msgtype::gsn_unregister_host);
+		
+		auto out = proto.process_packet(in, addr);
+		
+		REQUIRE(out->header().type == dvsp_msgtype::gsn_response);
+		REQUIRE(out->content_as<frame_response_code>().response == 200);
+		
+		REQUIRE(nstable.size() == 1);
+		REQUIRE(nstable.find_addr("192.168.1.2") == nstable.end());
+		REQUIRE(nstable.find_addr("192.168.1.3") != nstable.end());
+		
+	}
+	
+	SECTION("Unregister bad host") {
+		auto addr_bad = netspace_addr::from_string("192.168.1.10");
+		auto in = packet_of(dvsp_msgtype::gsn_unregister_host);
+		in.header().addr_orig = netspace_ipv4{192,168,1,10};
+		auto out = proto.process_packet(in, addr_bad);
+		
+		REQUIRE(out->header().type == dvsp_msgtype::gsn_response);
+		REQUIRE(out->content_as<frame_response_code>().response == 101);		
+	}
+
+	SECTION("Unregister bad hop") {
+		auto addr_bad = netspace_addr::from_string("192.168.1.10");
+		auto in = packet_of(dvsp_msgtype::gsn_unregister_host);
+		auto out = proto.process_packet(in, addr_bad);
+		
+		REQUIRE(out->header().type == dvsp_msgtype::gsn_response);
+		REQUIRE(out->content_as<frame_response_code>().response == 102);		
+	}
+}
