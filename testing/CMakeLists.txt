@@ -1,6 +1,11 @@
 project( catch_lnp )
 
-include_directories( "${CMAKE_CURRENT_SOURCE_DIR}/include" )
+include_directories( 
+    "${CMAKE_CURRENT_SOURCE_DIR}/include" 
+    "${CMAKE_CURRENT_SOURCE_DIR}/../nodes" 
+)
+
+set( NDIR "${CMAKE_CURRENT_SOURCE_DIR}/../nodes" )
 
 set( SRC_SHARED 
     shared/mod_crypto.cpp 
@@ -14,6 +19,7 @@ set( SRC_SHARED
 )
 
 set( SRC_NODES
+    nodes/root/mod_root_protocol.cpp 
     nodes/root/mod_node_root.cpp 
 )
 set( SOURCES entry.cpp ${SRC_SHARED} ${SRC_NODES} )
