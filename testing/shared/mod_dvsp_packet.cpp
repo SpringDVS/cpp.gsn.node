@@ -1,7 +1,10 @@
 #include "catch.hpp"
 #include "protocol/dvsp_packet.hpp"
 
-
+TEST_CASE("Test protocol_common free functions", "[shared],[dvsp_packet],[free]") {
+	auto ipstr = ns_ipv4_str(netspace_ipv4{172,168,1,1});
+	REQUIRE(ipstr == "172.168.1.1");
+}
 TEST_CASE( "Test dvsp_packet Ctor", "[shared],[dvsp_packet]" ) {
 	SECTION("Default") {
 		dvsp_packet p;
