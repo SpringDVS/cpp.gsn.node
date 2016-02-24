@@ -17,8 +17,13 @@
 #include <boost/asio.hpp>
 #include "common.hpp"
 
+enum class netnode_type : char {
+	undefined, root, org, trusted, georoot, _final
+};
+
+
 using netspace_addr = boost::asio::ip::address;
-using netspace_ipv4 = std::array<std::uint8_t, 4>;
+using netspace_ipv4 = boost::asio::detail::array<std::uint8_t, 4>;
 using netspace_tcp = boost::asio::ip::tcp;
 using netspace_ios = boost::asio::io_service;
 
