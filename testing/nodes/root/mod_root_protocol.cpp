@@ -1,6 +1,6 @@
 #include "catch.hpp"
 #include "root/protocol_handler.cpp"
-
+using rcode = dvsp_rcode;
 dvsp_packet packet_of(dvsp_msgtype type, std::string content = "") {
 	dvsp_packet p;
 	p.header().addr_dest = netspace_ipv4{192,168,1,1};
@@ -22,7 +22,8 @@ TEST_CASE("Test protocol_handler invalid msgtype","[node],[root],[protocol]") {
 
 	auto out = proto.process_packet(in, addr);
 	REQUIRE(out->header().type == dvsp_msgtype::gsn_response);
-	REQUIRE(out->content_as<frame_response_code>().response == 101);
+	
+	REQUIRE(out->content_as<frame_response_code>().response == rcode::malformed_content);
 }
 
 TEST_CASE("Test protocol_handler register (dynamic tables)", "[node],[root],[protocol]") {
@@ -38,7 +39,7 @@ TEST_CASE("Test protocol_handler register (dynamic tables)", "[node],[root],[pro
 		
 		auto out = proto.process_packet(in, addr);
 		REQUIRE(out->header().type == dvsp_msgtype::gsn_response);
-		REQUIRE(out->content_as<frame_response_code>().response == 200);
+		REQUIRE(out->content_as<frame_response_code>().response == rcode::ok);
 		REQUIRE(nstable.size() > 0);
 		
 		auto it = nstable.find_addr("192.168.1.2");
@@ -56,7 +57,7 @@ TEST_CASE("Test protocol_handler register (dynamic tables)", "[node],[root],[pro
 		proto.process_packet(in, addr);
 		auto out = proto.process_packet(in, addr);
 		REQUIRE(out->header().type == dvsp_msgtype::gsn_response);
-		REQUIRE(out->content_as<frame_response_code>().response == 101);
+		REQUIRE(out->content_as<frame_response_code>().response == rcode::netspace_error);
 	}
 	
 	SECTION("Malformed node type") {
@@ -67,7 +68,7 @@ TEST_CASE("Test protocol_handler register (dynamic tables)", "[node],[root],[pro
 		in.copy_content(&fr, sizeof(fr));
 		auto out = proto.process_packet(in, addr);
 		REQUIRE(out->header().type == dvsp_msgtype::gsn_response);
-		REQUIRE(out->content_as<frame_response_code>().response == 103);
+		REQUIRE(out->content_as<frame_response_code>().response == rcode::malformed_content);
 	}
 	
 	SECTION("Bad network hop") {
@@ -78,11 +79,11 @@ TEST_CASE("Test protocol_handler register (dynamic tables)", "[node],[root],[pro
 		auto addr_bad = netspace_addr::from_string("192.168.1.3");
 		auto out = proto.process_packet(in, addr_bad);
 		REQUIRE(out->header().type == dvsp_msgtype::gsn_response);
-		REQUIRE(out->content_as<frame_response_code>().response == 102);
+		REQUIRE(out->content_as<frame_response_code>().response == rcode::network_error);
 	}
 }
 
-TEST_CASE("Test protocol_handler uregister (dynamic tables)", "[node],[root],[protocol]") {
+TEST_CASE("Test protocol_handler unregister (dynamic tables)", "[node],[root],[protocol]") {
 	netspace_table nstable;
 	metaspace_gsn msgsn;
 	protocol_handler proto(nstable, msgsn);
@@ -99,7 +100,7 @@ TEST_CASE("Test protocol_handler uregister (dynamic tables)", "[node],[root],[pr
 		auto out = proto.process_packet(in, addr);
 		
 		REQUIRE(out->header().type == dvsp_msgtype::gsn_response);
-		REQUIRE(out->content_as<frame_response_code>().response == 200);
+		REQUIRE(out->content_as<frame_response_code>().response == rcode::ok);
 		
 		REQUIRE(nstable.size() == 1);
 		REQUIRE(nstable.find_addr("192.168.1.2") == nstable.end());
@@ -114,7 +115,7 @@ TEST_CASE("Test protocol_handler uregister (dynamic tables)", "[node],[root],[pr
 		auto out = proto.process_packet(in, addr_bad);
 		
 		REQUIRE(out->header().type == dvsp_msgtype::gsn_response);
-		REQUIRE(out->content_as<frame_response_code>().response == 101);		
+		REQUIRE(out->content_as<frame_response_code>().response == rcode::netspace_error);		
 	}
 
 	SECTION("Unregister bad hop") {
@@ -123,6 +124,6 @@ TEST_CASE("Test protocol_handler uregister (dynamic tables)", "[node],[root],[pr
 		auto out = proto.process_packet(in, addr_bad);
 		
 		REQUIRE(out->header().type == dvsp_msgtype::gsn_response);
-		REQUIRE(out->content_as<frame_response_code>().response == 102);		
+		REQUIRE(out->content_as<frame_response_code>().response == rcode::network_error);		
 	}
 }
