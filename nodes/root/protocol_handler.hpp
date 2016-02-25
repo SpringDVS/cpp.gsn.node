@@ -20,6 +20,7 @@ private:
 	
 	packet_uptr register_host(const dvsp_packet& packet, const netspace_addr& addr);
 	packet_uptr unregister_host(const dvsp_packet& packet, const netspace_addr& addr);
+	packet_uptr resolve_gsn(const dvsp_packet& packet, const netspace_addr& addr);
 	
 	packet_uptr response(const netspace_addr& addr, dvsp_rcode code);
 };
