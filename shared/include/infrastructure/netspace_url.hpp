@@ -17,11 +17,11 @@ public:
 	netspace_url(const netspace_url& orig);
 	virtual ~netspace_url();
 	
-	cmpt_gsn static_route();
-	cmpt_glq geosub_query();
-	cmpt_nn national_network();
-	cmpt_res resource();
-	std::string query();
+	cmpt_gsn& static_route();
+	cmpt_glq& geosub_query();
+	cmpt_nn top_network();
+	cmpt_res& resource();
+	std::string& query();
 
 	std::string url();
 private:

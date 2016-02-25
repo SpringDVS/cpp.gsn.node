@@ -80,27 +80,42 @@ void netspace_url::decode() {
 	if(!m_gsn.size()) throw netspace_malformed_url();
 }
 
-netspace_url::cmpt_glq netspace_url::geosub_query() {
+netspace_url::cmpt_glq& netspace_url::geosub_query() {
 	return m_glq;
 } 
 
-netspace_url::cmpt_nn netspace_url::national_network() {
+netspace_url::cmpt_nn netspace_url::top_network() {
 	return m_gsn.back();
 }
 
-std::string netspace_url::query() {
+std::string& netspace_url::query() {
 	return m_spq;
 }
 
-netspace_url::cmpt_res netspace_url::resource() {
+netspace_url::cmpt_res& netspace_url::resource() {
 	return m_res;
 }
 
-netspace_url::cmpt_gsn netspace_url::static_route() {
+netspace_url::cmpt_gsn& netspace_url::static_route() {
 	return m_gsn;
 }
 
 std::string netspace_url::url() {
+	
+	std::stringstream ss;
+	ss << "spring://";
+		
+	for(auto i = 0u; i < m_gsn.size()-1; i++) {
+		ss << m_gsn[i] << ".";
+	}
+	ss << m_gsn.back();
+	
+	if(m_glq.length()) ss << ":" << m_glq;
+	if(m_res.length()) ss << "/" << m_res;
+	if(m_spq.length()) ss << "?" << m_spq;
+	
+	m_url = ss.str();
+	
 	return m_url;
 }
 
