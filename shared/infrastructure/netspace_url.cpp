@@ -100,7 +100,7 @@ netspace_url::cmpt_gsn& netspace_url::static_route() {
 	return m_gsn;
 }
 
-std::string netspace_url::url() {
+std::string netspace_url::to_string() {
 	
 	std::stringstream ss;
 	ss << "spring://";

@@ -23,7 +23,7 @@ public:
 	cmpt_res& resource();
 	std::string& query();
 
-	std::string url();
+	std::string to_string();
 private:
 	std::string m_url;
 	cmpt_gsn m_gsn;

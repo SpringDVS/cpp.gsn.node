@@ -103,36 +103,36 @@ TEST_CASE("Test netspace_url reconstruction", "[shared],[netspace_url]") {
 	netspace_url url("spring://org.gsn.nn:glq/resource?query");
 	
 	SECTION("Carbon-copy reconstruction") {
-		REQUIRE(url.url() == "spring://org.gsn.nn:glq/resource?query");
+		REQUIRE(url.to_string() == "spring://org.gsn.nn:glq/resource?query");
 	}
 	
 	SECTION("Static route change") {
 		url.static_route().pop_back();
-		REQUIRE(url.url() == "spring://org.gsn:glq/resource?query");
+		REQUIRE(url.to_string() == "spring://org.gsn:glq/resource?query");
 		url.static_route().pop_back();
-		REQUIRE(url.url() == "spring://org:glq/resource?query");
+		REQUIRE(url.to_string() == "spring://org:glq/resource?query");
 		url.static_route().push_back("esusx");
-		REQUIRE(url.url() == "spring://org.esusx:glq/resource?query");
+		REQUIRE(url.to_string() == "spring://org.esusx:glq/resource?query");
 	}
 	
 	SECTION("Geosub query change") {
 		url.geosub_query() = "";
-		REQUIRE(url.url() == "spring://org.gsn.nn/resource?query");
+		REQUIRE(url.to_string() == "spring://org.gsn.nn/resource?query");
 		url.geosub_query() = "foobar";
-		REQUIRE(url.url() == "spring://org.gsn.nn:foobar/resource?query");
+		REQUIRE(url.to_string() == "spring://org.gsn.nn:foobar/resource?query");
 	}
 
 	SECTION("Resource change") {
 		url.resource() = "";
-		REQUIRE(url.url() == "spring://org.gsn.nn:glq?query");
+		REQUIRE(url.to_string() == "spring://org.gsn.nn:glq?query");
 		url.resource() = "barfoo";
-		REQUIRE(url.url() == "spring://org.gsn.nn:glq/barfoo?query");
+		REQUIRE(url.to_string() == "spring://org.gsn.nn:glq/barfoo?query");
 	}
 	
 	SECTION("Query change") {
 		url.query() = "";
-		REQUIRE(url.url() == "spring://org.gsn.nn:glq/resource");
+		REQUIRE(url.to_string() == "spring://org.gsn.nn:glq/resource");
 		url.query() = "farboo";
-		REQUIRE(url.url() == "spring://org.gsn.nn:glq/resource?farboo");
+		REQUIRE(url.to_string() == "spring://org.gsn.nn:glq/resource?farboo");
 	}
 }
