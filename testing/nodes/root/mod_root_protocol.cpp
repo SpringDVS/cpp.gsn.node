@@ -30,14 +30,14 @@ TEST_CASE("Test protocol_handler register (dynamic tables)", "[node],[root],[pro
 	netspace_table nstable;
 	metaspace_gsn msgsn;
 	protocol_handler proto(nstable, msgsn);
-	auto addr = netspace_addr::from_string("192.168.1.2");
+	auto inbound_addr = netspace_addr::from_string("192.168.1.2");
 		
 	SECTION("Successful registration") {
 		auto fr = construct_frame_register(netnode_type::org, "dvs.test");
 		auto in = packet_of(dvsp_msgtype::gsn_register_host);
 		in.copy_content(&fr, sizeof(fr));
 		
-		auto out = proto.process_packet(in, addr);
+		auto out = proto.process_packet(in, inbound_addr);
 		REQUIRE(out->header().type == dvsp_msgtype::gsn_response);
 		REQUIRE(out->content_as<frame_response_code>().response == rcode::ok);
 		REQUIRE(nstable.size() > 0);
@@ -54,8 +54,8 @@ TEST_CASE("Test protocol_handler register (dynamic tables)", "[node],[root],[pro
 		auto in = packet_of(dvsp_msgtype::gsn_register_host);
 		in.copy_content(&fr, sizeof(fr));
 		
-		proto.process_packet(in, addr);
-		auto out = proto.process_packet(in, addr);
+		proto.process_packet(in, inbound_addr);
+		auto out = proto.process_packet(in, inbound_addr);
 		REQUIRE(out->header().type == dvsp_msgtype::gsn_response);
 		REQUIRE(out->content_as<frame_response_code>().response == rcode::netspace_error);
 	}
@@ -66,7 +66,7 @@ TEST_CASE("Test protocol_handler register (dynamic tables)", "[node],[root],[pro
 		*p = 100;
 		auto in = packet_of(dvsp_msgtype::gsn_register_host);
 		in.copy_content(&fr, sizeof(fr));
-		auto out = proto.process_packet(in, addr);
+		auto out = proto.process_packet(in, inbound_addr);
 		REQUIRE(out->header().type == dvsp_msgtype::gsn_response);
 		REQUIRE(out->content_as<frame_response_code>().response == rcode::malformed_content);
 	}
@@ -90,14 +90,14 @@ TEST_CASE("Test protocol_handler unregister (dynamic tables)", "[node],[root],[p
 	
 	nstable.add_node(netnode(netnode_type::org, "dvs.test", "192.168.1.2"));
 	nstable.add_node(netnode(netnode_type::org, "dvs.test2", "192.168.1.3"));
-	auto addr = netspace_addr::from_string("192.168.1.2");
+	auto inbound_addr = netspace_addr::from_string("192.168.1.2");
 	
 
 	SECTION("Successful unregistration") {
 		REQUIRE(nstable.size() == 2); // Sanity
 		auto in = packet_of(dvsp_msgtype::gsn_unregister_host);
 		
-		auto out = proto.process_packet(in, addr);
+		auto out = proto.process_packet(in, inbound_addr);
 		
 		REQUIRE(out->header().type == dvsp_msgtype::gsn_response);
 		REQUIRE(out->content_as<frame_response_code>().response == rcode::ok);
@@ -125,5 +125,39 @@ TEST_CASE("Test protocol_handler unregister (dynamic tables)", "[node],[root],[p
 		
 		REQUIRE(out->header().type == dvsp_msgtype::gsn_response);
 		REQUIRE(out->content_as<frame_response_code>().response == rcode::network_error);		
+	}
+}
+
+TEST_CASE("Test protocol_handler gsn resolution (dynamic tables)", "[node],[root],[protocol]") {
+	netspace_table nstable;
+	metaspace_gsn msgsn;
+	protocol_handler proto(nstable, msgsn);
+
+	nstable.add_node(netnode(netnode_type::root, "esusx", "192.168.1.3"));
+	nstable.add_node(netnode(netnode_type::org, "tst", "192.168.1.4"));
+	auto inbound_addr = netspace_addr::from_string("192.168.1.2");
+
+	SECTION("Invalid resolution") {
+		auto in = packet_of(dvsp_msgtype::gsn_resolution, "spring://tst.dvon.uk");
+		auto out = proto.process_packet(in, inbound_addr);
+		REQUIRE(out->header().type == dvsp_msgtype::gsn_response);
+		REQUIRE(out->content_as<frame_response_code>().response == rcode::netspace_error);
+	}
+	
+	SECTION("First hop resolution") {
+		auto in = packet_of(dvsp_msgtype::gsn_resolution, "spring://tst.esusx.uk");
+		auto out = proto.process_packet(in, inbound_addr);
+		auto expected = netspace_ipv4{192,168,1,3};
+		REQUIRE(out->header().type == dvsp_msgtype::gsn_resolution);
+		REQUIRE(out->header().addr_dest == expected);
+		REQUIRE(out->to_string() == "spring://tst.esusx");	
+	}
+	
+	SECTION("Last hop resolution") {
+		auto in = packet_of(dvsp_msgtype::gsn_resolution, "spring://tst.esusx");
+		auto out = proto.process_packet(in, inbound_addr);
+		
+		// for now
+		REQUIRE(out->content_as<frame_response_code>().response == rcode::fake_udp);
 	}
 }
