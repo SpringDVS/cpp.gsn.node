@@ -7,6 +7,8 @@ enum class dvsp_msgtype : char {
 	undefined,
 	gsn_register_host,
 	gsn_unregister_host,
+			
+	gsn_resolution,
 	gsn_local_area,
 	gsn_root_nodes,
 
@@ -23,7 +25,8 @@ enum class dvsp_rcode  : int {
 	netspace_error = 101,
 	network_error = 102,
 	malformed_content = 103,
-	ok = 200
+	ok = 200,
+	fake_udp = 505,
 };
 
 struct frame_register {
