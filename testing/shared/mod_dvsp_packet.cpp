@@ -55,7 +55,7 @@ TEST_CASE("Add binary content to dvsp_packet", "[shared],[dvsp_packet]") {
 	dvsp_packet p;
 	p.copy_content(&bd, sizeof(bin_data));
 	REQUIRE(p.header().size > 0);
-	auto bdc = reinterpret_cast<const bin_data&>(p.content());
+	auto bdc = p.content_as<const bin_data>();
 	REQUIRE(bdc.ui64 == bd.ui64);
 	REQUIRE(bdc.ul == bd.ul);
 	REQUIRE(bdc.ui8 == bd.ui8);
