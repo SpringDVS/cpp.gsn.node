@@ -21,7 +21,7 @@ packet_uptr protocol_handler::process_packet(const dvsp_packet& packet, const ne
 		case dvsp_msgtype::gsn_unregister_host:
 			return unregister_host(packet, addr);
 		default:
-			return response(addr, 101);
+			return response(addr, dvsp_rcode::malformed_content);
 	}
 }
 
@@ -29,15 +29,15 @@ packet_uptr protocol_handler::register_host(const dvsp_packet& packet, const net
 
 	// GSN management should not hop
 	if(addr.to_v4().to_bytes() != packet.header().addr_orig)
-		return response(addr, 102); // Network error
+		return response(addr, dvsp_rcode::network_error); // Network error
 	
 	if(m_nstable.find_addr(addr.to_string()) != m_nstable.end())
-		return response(addr, 101); // Table error
+		return response(addr, dvsp_rcode::netspace_error); // Table error
 
 	auto st = reinterpret_cast<const frame_register&>(packet.content());
 	
 	if(st.type >= static_cast<char>(netnode_type::_final))
-		return response(addr, 103); // Malformed content
+		return response(addr, dvsp_rcode::malformed_content); // Malformed content
 	
 	std::string hostname;
 	hostname.assign(st.hostname.data(), st.len);
@@ -45,23 +45,23 @@ packet_uptr protocol_handler::register_host(const dvsp_packet& packet, const net
 	netnode n(static_cast<netnode_type>(st.type), hostname, addr.to_string());
 	
 	m_nstable.add_node(n);
-	return response(addr, 200);
+	return response(addr, dvsp_rcode::ok);
 }
 
 packet_uptr protocol_handler::unregister_host(const dvsp_packet& packet, const netspace_addr& addr) {
 	// GSN management should not hop
 	if(addr.to_v4().to_bytes() != packet.header().addr_orig)
-		return response(addr, 102); // Network error
+		return response(addr, dvsp_rcode::network_error); // Network error
 
 	auto it = m_nstable.find_addr(addr.to_string());
 	if(it == m_nstable.end())
-		return response(addr, 101); // Table error
+		return response(addr, dvsp_rcode::netspace_error); // Table error
 	
 	m_nstable.erase_node(it);
-	return response(addr, 200);
+	return response(addr, dvsp_rcode::ok);
 }
 
-packet_uptr protocol_handler::response(const netspace_addr& addr, int code) {
+packet_uptr protocol_handler::response(const netspace_addr& addr, dvsp_rcode code) {
 	packet_uptr p(new dvsp_packet);
 	
 	p->header().type = dvsp_msgtype::gsn_response;
