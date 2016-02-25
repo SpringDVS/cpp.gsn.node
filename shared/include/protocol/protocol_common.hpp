@@ -19,6 +19,13 @@ enum class dvsp_msgtype : char {
 	management_echo,
 };
 
+enum class dvsp_rcode  : int {
+	netspace_error = 101,
+	network_error = 102,
+	malformed_content = 103,
+	ok = 200
+};
+
 struct frame_register {
 	char type;
 	char len;
@@ -26,7 +33,7 @@ struct frame_register {
 };
 
 struct frame_response_code {
-	int response;
+	dvsp_rcode response;
 };
 
 inline frame_register construct_frame_register(netnode_type type, std::string hostname) {
@@ -38,7 +45,7 @@ inline frame_register construct_frame_register(netnode_type type, std::string ho
 	return fr;
 };
 
-inline frame_response_code construct_frame_response_code(int code) {
+inline frame_response_code construct_frame_response_code(dvsp_rcode code) {
 	frame_response_code frc;
 	frc.response = code;
 	return frc;
