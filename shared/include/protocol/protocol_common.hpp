@@ -44,6 +44,12 @@ struct  __attribute__((packed)) frame_address {
 	netspace_ipv4 addr;
 };
 
+struct __attribute__((packed)) frame_gsn_local {
+	dvsp_rcode response;
+	char total;
+	std::uint16_t size;
+};
+
 inline frame_register construct_frame_register(netnode_type type, std::string hostname) {
 	frame_register fr;
 
@@ -63,6 +69,23 @@ inline frame_address construct_frame_address(netspace_addr addr) {
 	frame_address f;
 	f.response = dvsp_rcode::ok;
 	f.addr = addr.to_v4().to_bytes();
+	return f;
+}
+
+inline frame_gsn_local* construct_frame_gsn_local(const std::vector<netspace_ipv4>& nodes) {
+	auto sz = sizeof(frame_gsn_local) + (nodes.size()*4)+1;
+	auto heap = new std::uint8_t[sz];
+	auto f = reinterpret_cast<frame_gsn_local*>(heap);
+
+	f->response = dvsp_rcode::ok;
+	f->total = nodes.size();
+	f->size = sz;
+	auto ptr = heap + sizeof(frame_gsn_local)+1;
+	
+	for(auto& n : nodes) {
+		std::copy(n.data(), n.data()+4, ptr);
+		ptr += 4;
+	}
 	return f;
 }
 #endif /* PROTOCOL_COMMON_HPP */
