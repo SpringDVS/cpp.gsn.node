@@ -198,7 +198,7 @@ TEST_CASE("Test protocol_handler resolution from gsn query (dynamic tables)", "[
 	}
 }
 
-TEST_CASE("Test protocol_handler local gsn (dynamic tables)", "[node],[root],[protocol]") {
+TEST_CASE("Test protocol_handler get nodes local/root (dynamic tables)", "[node],[root],[protocol]") {
 	netspace_table nstable;
 	metaspace_gsn msgsn;
 	protocol_handler proto(nstable, msgsn);
@@ -211,39 +211,34 @@ TEST_CASE("Test protocol_handler local gsn (dynamic tables)", "[node],[root],[pr
 	
 	auto inbound_addr = netspace_addr::from_string("192.168.1.2");
 	
-	SECTION("Successful query") {
+	SECTION("Successful local gsn request") {
 		auto in = packet_of(dvsp_msgtype::gsn_local_area);
 		auto out = proto.process_packet(in, inbound_addr);
-		auto frame = out->content_as<frame_gsn_local>();
+		auto frame = out->content_as<frame_network>();
 		REQUIRE( out->header().type == msgtype::gsn_response );
 		REQUIRE( frame.response == rcode::ok );
 		REQUIRE( frame.total == 3);
-		REQUIRE( frame.size == (frame.total*4 + sizeof(frame_gsn_local)+1));
+		REQUIRE( frame.size == (frame.total*4 + sizeof(frame_network)+1));
 		
 		netspace_ipv4 addr = {{192,168,1,6}};
 		for(auto i = 0; i < frame.total; i++) {
-			auto check = out->content_as<netspace_ipv4>(sizeof(frame_gsn_local) + 1 + (4*i));
+			auto check = out->content_as<netspace_ipv4>(sizeof(frame_network) + 1 + (4*i));
 			REQUIRE(addr == check);
 			addr[3]++;
 		}
 	}
 
-	SECTION("Failed query") {
-		auto in = packet_of(dvsp_msgtype::gsn_local_area);
+	SECTION("Successful root node request") {
+		auto in = packet_of(dvsp_msgtype::gtn_root_nodes);
 		auto out = proto.process_packet(in, inbound_addr);
-		auto frame = out->content_as<frame_gsn_local>();
+		auto frame = out->content_as<frame_network>();
 		REQUIRE( out->header().type == msgtype::gsn_response );
 		REQUIRE( frame.response == rcode::ok );
-		REQUIRE( frame.total == 3);
-		REQUIRE( frame.size == (frame.total*4 + sizeof(frame_gsn_local)+1));
+		REQUIRE( frame.total == 1);
+		REQUIRE( frame.size == (frame.total*4 + sizeof(frame_network)+1));
 		
-		netspace_ipv4 addr = {{192,168,1,6}};
-		for(auto i = 0; i < frame.total; i++) {
-			auto a = out->content_as<std::uint8_t[4]>(sizeof(frame_gsn_local) + 1 + (4*i));
-			for(auto j = 0; j < 4; j++)
-				REQUIRE(a[i] == addr[i]);
-			
-			addr[3]++;
-		}
+		netspace_ipv4 addr = {{192,168,1,1}};
+		auto check = out->content_as<netspace_ipv4>(sizeof(frame_network) + 1);
+		REQUIRE(addr == check);
 	}
 }
