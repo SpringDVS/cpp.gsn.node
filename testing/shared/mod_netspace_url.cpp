@@ -113,6 +113,8 @@ TEST_CASE("Test netspace_url reconstruction", "[shared],[netspace_url]") {
 		REQUIRE(url.to_string() == "spring://org:glq/resource?query");
 		url.static_route().push_back("esusx");
 		REQUIRE(url.to_string() == "spring://org.esusx:glq/resource?query");
+		url.static_route().clear();
+		REQUIRE(url.to_string() == "spring://:glq/resource?query");
 	}
 	
 	SECTION("Geosub query change") {

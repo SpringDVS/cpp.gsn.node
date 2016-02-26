@@ -104,11 +104,12 @@ std::string netspace_url::to_string() {
 	
 	std::stringstream ss;
 	ss << "spring://";
-		
-	for(auto i = 0u; i < m_gsn.size()-1; i++) {
-		ss << m_gsn[i] << ".";
+	if(m_gsn.size()) {
+		for(auto i = 0u; i < m_gsn.size()-1; i++) {
+			ss << m_gsn[i] << ".";
+		}
+		ss << m_gsn.back();
 	}
-	ss << m_gsn.back();
 	
 	if(m_glq.length()) ss << ":" << m_glq;
 	if(m_res.length()) ss << "/" << m_res;
