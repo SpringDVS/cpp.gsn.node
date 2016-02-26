@@ -60,8 +60,8 @@ public:
 	const generic_type& content() const;
 	
 	template<class T>
-	const T& content_as() const {
-		return reinterpret_cast<const T&>(*m_content);
+	const T& content_as(size_type offset = 0) const {
+		return reinterpret_cast<const T&>(*(m_content+offset));
 	};
 	
 	std::string to_string() const;
