@@ -197,3 +197,53 @@ TEST_CASE("Test protocol_handler resolution from gsn query (dynamic tables)", "[
 		REQUIRE( frame.response == rcode::netspace_error );
 	}
 }
+
+TEST_CASE("Test protocol_handler local gsn (dynamic tables)", "[node],[root],[protocol]") {
+	netspace_table nstable;
+	metaspace_gsn msgsn;
+	protocol_handler proto(nstable, msgsn);
+
+	nstable.add_node(netnode(netnode_type::root, "root", "192.168.1.1"));
+	nstable.add_node(netnode(netnode_type::org, "org1", "192.168.1.6"));
+	nstable.add_node(netnode(netnode_type::org, "org2", "192.168.1.7"));
+	nstable.add_node(netnode(netnode_type::org, "org3", "192.168.1.8"));
+	
+	
+	auto inbound_addr = netspace_addr::from_string("192.168.1.2");
+	
+	SECTION("Successful query") {
+		auto in = packet_of(dvsp_msgtype::gsn_local_area);
+		auto out = proto.process_packet(in, inbound_addr);
+		auto frame = out->content_as<frame_gsn_local>();
+		REQUIRE( out->header().type == msgtype::gsn_response );
+		REQUIRE( frame.response == rcode::ok );
+		REQUIRE( frame.total == 3);
+		REQUIRE( frame.size == (frame.total*4 + sizeof(frame_gsn_local)+1));
+		
+		netspace_ipv4 addr = {{192,168,1,6}};
+		for(auto i = 0; i < frame.total; i++) {
+			auto check = out->content_as<netspace_ipv4>(sizeof(frame_gsn_local) + 1 + (4*i));
+			REQUIRE(addr == check);
+			addr[3]++;
+		}
+	}
+
+	SECTION("Failed query") {
+		auto in = packet_of(dvsp_msgtype::gsn_local_area);
+		auto out = proto.process_packet(in, inbound_addr);
+		auto frame = out->content_as<frame_gsn_local>();
+		REQUIRE( out->header().type == msgtype::gsn_response );
+		REQUIRE( frame.response == rcode::ok );
+		REQUIRE( frame.total == 3);
+		REQUIRE( frame.size == (frame.total*4 + sizeof(frame_gsn_local)+1));
+		
+		netspace_ipv4 addr = {{192,168,1,6}};
+		for(auto i = 0; i < frame.total; i++) {
+			auto a = out->content_as<std::uint8_t[4]>(sizeof(frame_gsn_local) + 1 + (4*i));
+			for(auto j = 0; j < 4; j++)
+				REQUIRE(a[i] == addr[i]);
+			
+			addr[3]++;
+		}
+	}
+}
