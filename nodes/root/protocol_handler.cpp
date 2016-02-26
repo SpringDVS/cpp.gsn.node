@@ -71,29 +71,43 @@ packet_uptr protocol_handler::resolve_gsn(const dvsp_packet& packet) {
 	 * connections to perform gsn resolution through TCP
 	 */
 	netspace_url url(packet.to_string());
-	if(url.geosub_query() != "") {
-		// Here: Run a search on the metaspace -- needs impl
-		return response(dvsp_rcode::ok);
-	}
-	
 	auto& route = url.static_route();
 	route.pop_back();
+
+	if(url.static_route().size() == 0 && url.geosub_query() != "") {
+		// Here: Run a search on the metaspace -- needs impl
+		auto it =  m_nstable.find_host(m_msgsn.resolve_gsn(url.geosub_query()));
+
+		if(it == m_nstable.end()) return response(rcode::netspace_error);
+		packet_uptr p(new dvsp_packet);
+		p->header() = packet.header();
+		p->header().type = dvsp_msgtype::gsn_response;
+		auto frame = construct_frame_address((*it).address());
+		
+		p->copy_content(&frame, sizeof(frame));
+		return p;
+	}
+	
 	
 	/* TODO: This should be GSN identifier -- not
 	 * a particular host acting as a root node on
 	 * the GSN
 	 */
 	auto it = m_nstable.find_host(route.back());
+
 	if(it == m_nstable.end()) {
 		return response(rcode::netspace_error);
 	}
 	
 	
 	auto nodeip = (*it).address();
-	if(route.size() == 1) { // This could very well be a normal node
-		// We are at the end point
-		
-		return response(rcode::fake_udp); // not right response
+	if(route.size() == 1) { 
+		packet_uptr p(new dvsp_packet);
+		p->header() = packet.header();
+		p->header().type = dvsp_msgtype::gsn_response;
+		auto frame = construct_frame_address((*it).address());
+		p->copy_content(&frame, sizeof(frame));
+		return p;
 	}
 
 	/*
@@ -111,10 +125,15 @@ packet_uptr protocol_handler::resolve_gsn(const dvsp_packet& packet) {
 	
 }
 
+packet_uptr protocol_handler::query_gsn(const dvsp_packet& packet) {
+	packet.content();
+	return response(rcode::ok);
+}
+
 
 packet_uptr protocol_handler::response(dvsp_rcode code) {
 	packet_uptr p(new dvsp_packet);
-	
+
 	p->header().type = dvsp_msgtype::gsn_response;
 	auto frc = construct_frame_response_code(code);
 	p->copy_content(&frc, sizeof(frame_response_code));
