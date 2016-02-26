@@ -24,6 +24,9 @@ private:
 	packet_uptr query_gsn(const dvsp_packet& packet);
 	
 	packet_uptr local_gsn(const dvsp_packet& packet);
+	packet_uptr root_nodes(const dvsp_packet& packet);
+	
+	std::vector<netspace_ipv4> nodes_of(netnode_type type);
 	
 	packet_uptr response(dvsp_rcode code);
 };

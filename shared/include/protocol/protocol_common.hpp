@@ -44,7 +44,7 @@ struct  __attribute__((packed)) frame_address {
 	netspace_ipv4 addr;
 };
 
-struct __attribute__((packed)) frame_gsn_local {
+struct __attribute__((packed)) frame_network {
 	dvsp_rcode response;
 	char total;
 	std::uint16_t size;
@@ -72,15 +72,15 @@ inline frame_address construct_frame_address(netspace_addr addr) {
 	return f;
 }
 
-inline frame_gsn_local* construct_frame_gsn_local(const std::vector<netspace_ipv4>& nodes) {
-	auto sz = sizeof(frame_gsn_local) + (nodes.size()*4)+1;
+inline frame_network* construct_frame_network(const std::vector<netspace_ipv4>& nodes) {
+	auto sz = sizeof(frame_network) + (nodes.size()*4)+1;
 	auto heap = new std::uint8_t[sz];
-	auto f = reinterpret_cast<frame_gsn_local*>(heap);
+	auto f = reinterpret_cast<frame_network*>(heap);
 
 	f->response = dvsp_rcode::ok;
 	f->total = nodes.size();
 	f->size = sz;
-	auto ptr = heap + sizeof(frame_gsn_local)+1;
+	auto ptr = heap + sizeof(frame_network)+1;
 	
 	for(auto& n : nodes) {
 		std::copy(n.data(), n.data()+4, ptr);
