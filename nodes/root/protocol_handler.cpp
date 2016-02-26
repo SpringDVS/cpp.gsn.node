@@ -24,6 +24,8 @@ packet_uptr protocol_handler::process_packet(const dvsp_packet& packet, const ne
 			return unregister_host(packet, addr);
 		case dvsp_msgtype::gsn_resolution:
 			return resolve_gsn(packet);
+		case dvsp_msgtype::gsn_local_area:
+			return local_gsn(packet);
 		default:
 			return response(dvsp_rcode::malformed_content);
 	}
@@ -128,6 +130,22 @@ packet_uptr protocol_handler::resolve_gsn(const dvsp_packet& packet) {
 packet_uptr protocol_handler::query_gsn(const dvsp_packet& packet) {
 	packet.content();
 	return response(rcode::ok);
+}
+
+packet_uptr protocol_handler::local_gsn(const dvsp_packet& packet) {
+	std::vector<netspace_ipv4> nodes;
+	for(auto& n : m_nstable) {
+		if(n.type() == netnode_type::org)
+			nodes.push_back(n.address().to_v4().to_bytes());
+	}
+	
+	auto ptr = construct_frame_gsn_local(nodes);
+	packet_uptr p(new dvsp_packet);
+	p->header() = packet.header();
+	p->header().type = dvsp_msgtype::gsn_response;
+	p->copy_content(ptr, ptr->size);
+	delete[] ptr;
+	return p;
 }
 
 

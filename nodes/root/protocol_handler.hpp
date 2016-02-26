@@ -23,6 +23,8 @@ private:
 	packet_uptr resolve_gsn(const dvsp_packet& packet);
 	packet_uptr query_gsn(const dvsp_packet& packet);
 	
+	packet_uptr local_gsn(const dvsp_packet& packet);
+	
 	packet_uptr response(dvsp_rcode code);
 };
 
