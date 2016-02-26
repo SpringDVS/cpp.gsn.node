@@ -4,7 +4,8 @@ dvsp_packet::dvsp_packet()
 : m_header(), m_content(nullptr)
 { }
 
-dvsp_packet::dvsp_packet(const serial_ptr serial) 
+dvsp_packet::dvsp_packet(const serial_ptr serial)
+: m_header(), m_content(nullptr)
 { deserialise(serial); }
 
 dvsp_packet::dvsp_packet(const dvsp_packet& orig)

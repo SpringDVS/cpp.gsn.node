@@ -3,8 +3,8 @@
 using rcode = dvsp_rcode;
 dvsp_packet packet_of(dvsp_msgtype type, std::string content = "") {
 	dvsp_packet p;
-	p.header().addr_dest = netspace_ipv4{192,168,1,1};
-	p.header().addr_orig = netspace_ipv4{192,168,1,2};
+	p.header().addr_dest = netspace_ipv4{{192,168,1,1}};
+	p.header().addr_orig = netspace_ipv4{{192,168,1,2}};
 	p.header().type = type;
 	p.str_content(content);
 	return p;
@@ -31,12 +31,11 @@ TEST_CASE("Test protocol_handler register (dynamic tables)", "[node],[root],[pro
 	metaspace_gsn msgsn;
 	protocol_handler proto(nstable, msgsn);
 	auto inbound_addr = netspace_addr::from_string("192.168.1.2");
-		
+	auto in = packet_of(dvsp_msgtype::gsn_register_host);
+	auto fr = construct_frame_register(netnode_type::org, "dvs.test");
+
 	SECTION("Successful registration") {
-		auto fr = construct_frame_register(netnode_type::org, "dvs.test");
-		auto in = packet_of(dvsp_msgtype::gsn_register_host);
 		in.copy_content(&fr, sizeof(fr));
-		
 		auto out = proto.process_packet(in, inbound_addr);
 		REQUIRE(out->header().type == dvsp_msgtype::gsn_response);
 		REQUIRE(out->content_as<frame_response_code>().response == rcode::ok);
@@ -50,34 +49,29 @@ TEST_CASE("Test protocol_handler register (dynamic tables)", "[node],[root],[pro
 	}
 	
 	SECTION("Register existing IP") {
-		auto fr = construct_frame_register(netnode_type::org, "dvs.test");
-		auto in = packet_of(dvsp_msgtype::gsn_register_host);
-		in.copy_content(&fr, sizeof(fr));
-		
+		in.copy_content(&fr, sizeof(fr));		
 		proto.process_packet(in, inbound_addr);
 		auto out = proto.process_packet(in, inbound_addr);
+
 		REQUIRE(out->header().type == dvsp_msgtype::gsn_response);
 		REQUIRE(out->content_as<frame_response_code>().response == rcode::netspace_error);
 	}
 	
 	SECTION("Malformed node type") {
-		auto fr = construct_frame_register(netnode_type::org, "dvs.test");
 		auto p = static_cast<char*>(&fr.type);
 		*p = 100;
-		auto in = packet_of(dvsp_msgtype::gsn_register_host);
 		in.copy_content(&fr, sizeof(fr));
 		auto out = proto.process_packet(in, inbound_addr);
+
 		REQUIRE(out->header().type == dvsp_msgtype::gsn_response);
 		REQUIRE(out->content_as<frame_response_code>().response == rcode::malformed_content);
 	}
 	
 	SECTION("Bad network hop") {
-		auto fr = construct_frame_register(netnode_type::org, "dvs.test");
-		auto in = packet_of(dvsp_msgtype::gsn_register_host);
-		in.copy_content(&fr, sizeof(fr));
-		
+		in.copy_content(&fr, sizeof(fr));		
 		auto addr_bad = netspace_addr::from_string("192.168.1.3");
 		auto out = proto.process_packet(in, addr_bad);
+
 		REQUIRE(out->header().type == dvsp_msgtype::gsn_response);
 		REQUIRE(out->content_as<frame_response_code>().response == rcode::network_error);
 	}
@@ -94,9 +88,7 @@ TEST_CASE("Test protocol_handler unregister (dynamic tables)", "[node],[root],[p
 	
 
 	SECTION("Successful unregistration") {
-		REQUIRE(nstable.size() == 2); // Sanity
-		auto in = packet_of(dvsp_msgtype::gsn_unregister_host);
-		
+		auto in = packet_of(dvsp_msgtype::gsn_unregister_host);		
 		auto out = proto.process_packet(in, inbound_addr);
 		
 		REQUIRE(out->header().type == dvsp_msgtype::gsn_response);
@@ -111,7 +103,7 @@ TEST_CASE("Test protocol_handler unregister (dynamic tables)", "[node],[root],[p
 	SECTION("Unregister bad host") {
 		auto addr_bad = netspace_addr::from_string("192.168.1.10");
 		auto in = packet_of(dvsp_msgtype::gsn_unregister_host);
-		in.header().addr_orig = netspace_ipv4{192,168,1,10};
+		in.header().addr_orig = netspace_ipv4{{192,168,1,10}};
 		auto out = proto.process_packet(in, addr_bad);
 		
 		REQUIRE(out->header().type == dvsp_msgtype::gsn_response);
@@ -143,14 +135,14 @@ TEST_CASE("Test protocol_handler gsn resolution (dynamic tables)", "[node],[root
 		REQUIRE(out->header().type == dvsp_msgtype::gsn_response);
 		REQUIRE(out->content_as<frame_response_code>().response == rcode::netspace_error);
 	}
-	
+
 	SECTION("First hop resolution") {
 		auto in = packet_of(dvsp_msgtype::gsn_resolution, "spring://tst.esusx.uk");
 		auto out = proto.process_packet(in, inbound_addr);
-		auto expected = netspace_ipv4{192,168,1,3};
+		auto expected = netspace_ipv4{{192,168,1,3}};
 		REQUIRE(out->header().type == dvsp_msgtype::gsn_resolution);
 		REQUIRE(out->header().addr_dest == expected);
-		REQUIRE(out->to_string() == "spring://tst.esusx");	
+		REQUIRE(out->to_string() == "spring://tst.esusx");
 	}
 	
 	SECTION("Last hop resolution") {

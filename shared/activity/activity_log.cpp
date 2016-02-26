@@ -10,7 +10,7 @@ activity_log::activity_log()
 log_transaction activity_log::begin_transaction() {
 	m_mutex.lock();
 	m_transacting = true;
-	return std::move(log_transaction(*this));
+	return log_transaction(*this);
 }
 
 void activity_log::end_transaction() {

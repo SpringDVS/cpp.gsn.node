@@ -14,7 +14,7 @@ public:
 	
 	typedef utility_type::size_type size_type;
 	typedef value_type& reference;
-	typedef const reference const_reference;
+	typedef const value_type& const_reference;
 
 	
 	typedef utility_type::serial_type serial_type;

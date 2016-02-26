@@ -148,12 +148,6 @@ bool log_transaction::head_verification(const_reference record) const {
 	return check.header().hash == record.header().hash;
 }
 
-bool log_transaction::verification_from(hash512 hash) const {
-	is_valid();
-	
-	return true;
-}
-
 log_transaction::serial_ptr log_transaction::serialise() const {
 	is_valid();
 	auto hdr_ptr = reinterpret_cast<serial_ptr>(&m_header);

@@ -15,7 +15,7 @@ public:
 	typedef utility_type::serial_ptr serial_ptr;
 	
 	typedef value_type& reference;
-	typedef const reference const_reference;
+	typedef const value_type& const_reference;
 
 	typedef log_type::iterator iterator;
 	typedef log_type::const_iterator const_iterator;
@@ -104,7 +104,6 @@ public:
 	bool log_verification() const;
 	
 	bool head_verification(const_reference record) const;
-	bool verification_from(hash512 hash) const;
 
 	size_type log_size() const;
 	size_type log_size_partial() const;

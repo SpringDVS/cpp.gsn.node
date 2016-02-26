@@ -24,7 +24,7 @@ TEST_CASE( "Test ctors", "[shared],[activity]" ) {
 		
 		
 		auto& hdr = act.header();
-		REQUIRE(hdr.hash == hash512{0});
+		REQUIRE(hdr.hash == hash512{{0}});
 		REQUIRE(hdr.timestamp == 0);
 		REQUIRE(hdr.signature[253] == 0);
 		REQUIRE(hdr.type == activity_type::undefined);

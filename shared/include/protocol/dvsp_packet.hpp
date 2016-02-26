@@ -13,8 +13,8 @@ struct dvsp_header {
 		: type(dvsp_msgtype::undefined)
 		, part(false)
 		, size(0)
-		, addr_orig{0}
-		, addr_dest{0}
+		, addr_orig{{0}}
+		, addr_dest{{0}}
 		{ }
 };
 

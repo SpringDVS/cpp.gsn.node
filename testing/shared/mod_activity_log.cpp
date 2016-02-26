@@ -14,7 +14,7 @@ TEST_CASE("Test log_segment ctor", "[shared],[activity_log],[log_segment]") {
     log_utility::container_type log;
 
 	char data[11] = "HelloWorld";
-	auto hash = std::move(hash_sha512(data, 10));
+	auto hash = hash_sha512(data, 10);
 
     for(auto i = 0u; i < 5; i++)
         log.push_back(activity_m());
@@ -44,7 +44,7 @@ TEST_CASE("Test transaction objects") {
 	SECTION("Test invalid_state exception") {
 		auto t = log.begin_transaction();
 		auto u = std::move(t);
-		REQUIRE_THROWS_AS(t.header().hash, transaction_invalid_state);
+		REQUIRE_THROWS_AS(t.header(), transaction_invalid_state);
 	}
 }
 
@@ -58,7 +58,7 @@ TEST_CASE("Test Record transaction", "[shared],[activity_log],[log_transaction]"
 		hdr.signature[21] = 0xe;
 		
 		auto act = t.generate_record(hdr);
-		REQUIRE(act.header().hash != hash512{0});
+		REQUIRE(act.header().hash != hash512{{0}});
 		REQUIRE(act.header().type == activity_type::trusted_verify);
 	}
 	

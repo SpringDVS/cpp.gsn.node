@@ -18,9 +18,9 @@ enum class activity_type
 struct activity_header  
 {
 	activity_header()
-	: hash({0}), timestamp(0)
+	: hash{{0}}, timestamp(0)
 	, type(activity_type::undefined), msg_size(0)
-	, signature({0})
+	, signature{{0}}
 	{ };
 
 	hash512			hash;

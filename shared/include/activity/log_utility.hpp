@@ -11,7 +11,7 @@ struct log_header {
 	
 	log_header()
 		: num_records(0)
-		, hash{0}
+		, hash{{0}}
 	{ }
 	
 	int num_records;
