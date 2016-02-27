@@ -13,6 +13,7 @@ TEST_CASE( "Test dvsp_packet Ctor", "[shared],[dvsp_packet]" ) {
 		REQUIRE( p.header().size == 0 );
 		REQUIRE( p.header().addr_orig == netspace_ipv4{{0}} );
 		REQUIRE( p.header().addr_dest == netspace_ipv4{{0}} );
+		REQUIRE( p.size() == sizeof(dvsp_header) );
 	}
 }
 
@@ -31,7 +32,7 @@ TEST_CASE("Modification of dvsp_packet", "[shared],[dvsp_packet]") {
 	REQUIRE( h.addr_orig == netspace_ipv4({{192,168,0,2}}) );
 	REQUIRE( h.type == dvsp_msgtype::gsn_request );
 	REQUIRE( p.to_string() == "Foo" );
-	
+	REQUIRE( p.size() == (sizeof(dvsp_header) + 3));
 	/* //const correctness
 	const dvsp_packet cp;
 	cp.header().type = dvsp_msgtype::gsn_request;
@@ -59,6 +60,7 @@ TEST_CASE("Add binary content to dvsp_packet", "[shared],[dvsp_packet]") {
 	REQUIRE(bdc.ui64 == bd.ui64);
 	REQUIRE(bdc.ul == bd.ul);
 	REQUIRE(bdc.ui8 == bd.ui8);
+	REQUIRE( p.size() == (sizeof(dvsp_header) + sizeof(bin_data)) );
 }
 
 TEST_CASE("Empty Content", "[shared],[dvsp_packet]") {

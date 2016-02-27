@@ -67,6 +67,7 @@ public:
 	std::string to_string() const;
 	
 	serial_ptr serialise() const;
+	size_type size() const;
 
 private:
 	dvsp_header m_header;

@@ -77,3 +77,7 @@ void dvsp_packet::deserialise(const serial_ptr serial) noexcept {
 	auto data_ptr = serial+sizeof(dvsp_header);
 	std::copy(data_ptr, data_ptr+m_header.size, m_content);
 }
+
+dvsp_packet::size_type dvsp_packet::size() const {
+	return sizeof(dvsp_header) + m_header.size;
+}
