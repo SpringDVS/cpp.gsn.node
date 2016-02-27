@@ -8,6 +8,7 @@ include_directories(
 set( NDIR "${CMAKE_CURRENT_SOURCE_DIR}/../nodes" )
 
 set( SRC_SHARED 
+    shared/mod_free_fn.cpp 
     shared/mod_crypto.cpp 
     shared/mod_activity.cpp 
     shared/mod_activity_log.cpp
