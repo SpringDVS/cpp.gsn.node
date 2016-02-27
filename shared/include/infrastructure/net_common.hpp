@@ -29,6 +29,7 @@ using netspace_udp = boost::asio::ip::udp;
 using netspace_ios = boost::asio::io_service;
 
 #define NS_PORT 55400
+#define GSN_SERVICE_PORT 55301
 
 inline netspace_addr ipv4_to_netspace_addr(netspace_ipv4& addr) {
 	return netspace_addr(boost::asio::ip::address_v4(addr));
