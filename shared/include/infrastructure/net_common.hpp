@@ -35,5 +35,16 @@ inline netspace_addr ipv4_to_netspace_addr(netspace_ipv4& addr) {
 	return netspace_addr(boost::asio::ip::address_v4(addr));
 }
 
+inline std::string ipv4_to_string(netspace_ipv4& addr) {
+	std::stringstream ss;
+	
+	ss	<< std::to_string(addr[0]) << "."
+		<< std::to_string(addr[1]) << "."
+		<< std::to_string(addr[2]) << "."
+		<< std::to_string(addr[3]);
+	
+	return ss.str();
+}
+
 #endif /* NET_COMMON_HPP */
 
