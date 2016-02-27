@@ -25,10 +25,14 @@ enum class netnode_type : char {
 using netspace_addr = boost::asio::ip::address;
 using netspace_ipv4 = boost::asio::detail::array<std::uint8_t, 4>;
 using netspace_tcp = boost::asio::ip::tcp;
+using netspace_udp = boost::asio::ip::udp;
 using netspace_ios = boost::asio::io_service;
 
 #define NS_PORT 55400
 
+inline netspace_addr ipv4_to_netspace_addr(netspace_ipv4& addr) {
+	return netspace_addr(boost::asio::ip::address_v4(addr));
+}
 
 #endif /* NET_COMMON_HPP */
 
