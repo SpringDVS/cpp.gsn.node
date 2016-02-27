@@ -34,10 +34,12 @@ void forge_gsn_unregister_host(netspace_addr target) {
 void run_forge(dvsp_msgtype type, netspace_addr target, std::string content) {
 	packet_uptr p;
 	switch(type) {
-		case msgtype::gsn_register_host: 
+		case msgtype::gsn_register_host:
+			std::cout << "Forging `gsn_register_host`... ";
 			forge_gsn_register_host(target);
 			break;
-		case msgtype::gsn_unregister_host: 
+		case msgtype::gsn_unregister_host:
+			std::cout << "Forging `gsn_unregister_host`... ";
 			forge_gsn_unregister_host(target);
 			break;
 			
@@ -58,6 +60,7 @@ std::string rcode_to_string(rcode code) {
 }
 
 packet_uptr dispatch_packet(packet_uptr packet) {
+	std::cout << "OK" << std::endl;
 	netspace_ios io_service;
 	netspace_udp::resolver resolver(io_service);
 

@@ -27,13 +27,15 @@ int main(int argc, char** argv) {
 	
 	//netspace_ipv4 destination{{127,0,0,1}};
 	
+	std::string content;
 	auto ptype = msgtype::gsn_register_host;
+	auto target = netspace_addr::from_string("127.0.0.1");
 	
 	po::options_description desc("Options");
 	desc.add_options()
 			("type",po::value<string>(),"Forge packet of type")
-			("target","Change target machine")
-			("content","String content")
+			("target",po::value<string>(),"Change target machine")
+			("content",po::value<string>(),"String content")
 			("help","Display this message");
 	
 	po::variables_map vars;
@@ -52,8 +54,15 @@ int main(int argc, char** argv) {
 		}
 	}
 	
+	if(vars.count("target")) {
+		target = netspace_addr::from_string(vars["target"].as<string>());
+	}
 	
+	if(vars.count("content")) {
+		content = vars["content"].as<string>();
+	}
 	
+	run_forge(ptype, target, content);
 	return 0;
 }
 
