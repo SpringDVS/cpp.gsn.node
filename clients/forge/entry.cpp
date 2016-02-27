@@ -67,7 +67,9 @@ int main(int argc, char** argv) {
 }
 
 msgtype parse_msgtype(std::string str) {
-		if(str == "gsn_unregister_host")
+		if(str == "gsn_register_host")
+			return msgtype::gsn_register_host;
+		else if(str == "gsn_unregister_host")
 			return msgtype::gsn_unregister_host;
 		else if(str == "gsn_resolution")
 			return msgtype::gsn_resolution;

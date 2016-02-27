@@ -71,9 +71,10 @@ packet_uptr dispatch_packet(packet_uptr packet) {
 	netspace_udp::socket socket(io_service);
 	socket.open(netspace_udp::v4());
 	
-	auto ptr = reinterpret_cast<char*>(packet.get());
+	auto ptr = packet->serialise();
 	
 	socket.send_to(boost::asio::buffer(ptr, packet->size()), rcv_ep);
+	
 	boost::array<char, 512> recv_buf;
 	
 	netspace_udp::endpoint snd_ep;
