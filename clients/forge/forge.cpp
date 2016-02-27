@@ -62,7 +62,6 @@ void forge_gsn_local_area(netspace_addr target) {
 }
 
 void run_forge(dvsp_msgtype type, netspace_addr target, std::string content) {
-	packet_uptr p;
 	switch(type) {
 		case msgtype::gsn_register_host:
 			std::cout << "Forging `gsn_register_host`... ";
