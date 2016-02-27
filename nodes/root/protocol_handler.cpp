@@ -36,8 +36,9 @@ packet_uptr protocol_handler::process_packet(const dvsp_packet& packet, const ne
 packet_uptr protocol_handler::register_host(const dvsp_packet& packet, const netspace_addr& addr) {
 
 	// GSN management should not hop
-	if(addr.to_v4().to_bytes() != packet.header().addr_orig)
-		return response(dvsp_rcode::network_error); // Network error
+	// ToDo: End point problems -- Fix this behaviour
+	//if(addr.to_v4().to_bytes() != packet.header().addr_orig)
+	//	return response(dvsp_rcode::network_error); // Network error
 	
 	if(m_nstable.find_addr(addr.to_string()) != m_nstable.end())
 		return response(dvsp_rcode::netspace_error); // Table error
@@ -59,9 +60,10 @@ packet_uptr protocol_handler::register_host(const dvsp_packet& packet, const net
 
 packet_uptr protocol_handler::unregister_host(const dvsp_packet& packet, const netspace_addr& addr) {
 	// GSN management should not hop
-	if(addr.to_v4().to_bytes() != packet.header().addr_orig)
-		return response(dvsp_rcode::network_error); // Network error
-
+	// ToDo: End point problems -- Fix this behaviour
+	//if(addr.to_v4().to_bytes() != packet.header().addr_orig)
+	//	return response(dvsp_rcode::network_error); // Network error
+	packet.size();
 	auto it = m_nstable.find_addr(addr.to_string());
 	if(it == m_nstable.end())
 		return response(dvsp_rcode::netspace_error); // Table error

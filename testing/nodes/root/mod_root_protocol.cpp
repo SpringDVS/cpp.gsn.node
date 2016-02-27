@@ -68,6 +68,8 @@ TEST_CASE("Test protocol_handler register (dynamic tables)", "[node],[root],[pro
 		REQUIRE(out->content_as<frame_response_code>().response == rcode::malformed_content);
 	}
 	
+	/* NOTE: This will be brought back in
+	 * 
 	SECTION("Bad network hop") {
 		in.copy_content(&fr, sizeof(fr));		
 		auto addr_bad = netspace_addr::from_string("192.168.1.3");
@@ -76,6 +78,7 @@ TEST_CASE("Test protocol_handler register (dynamic tables)", "[node],[root],[pro
 		REQUIRE(out->header().type == dvsp_msgtype::gsn_response);
 		REQUIRE(out->content_as<frame_response_code>().response == rcode::network_error);
 	}
+	*/
 }
 
 TEST_CASE("Test protocol_handler unregister (dynamic tables)", "[node],[root],[protocol]") {
@@ -110,7 +113,9 @@ TEST_CASE("Test protocol_handler unregister (dynamic tables)", "[node],[root],[p
 		REQUIRE(out->header().type == dvsp_msgtype::gsn_response);
 		REQUIRE(out->content_as<frame_response_code>().response == rcode::netspace_error);		
 	}
-
+	
+	/* NOTE: This will be brought back in
+	 * 
 	SECTION("Unregister bad hop") {
 		auto addr_bad = netspace_addr::from_string("192.168.1.10");
 		auto in = packet_of(dvsp_msgtype::gsn_unregister_host);
@@ -119,6 +124,7 @@ TEST_CASE("Test protocol_handler unregister (dynamic tables)", "[node],[root],[p
 		REQUIRE(out->header().type == dvsp_msgtype::gsn_response);
 		REQUIRE(out->content_as<frame_response_code>().response == rcode::network_error);		
 	}
+	*/
 }
 
 TEST_CASE("Test protocol_handler gsn resolution (dynamic tables)", "[node],[root],[protocol]") {
