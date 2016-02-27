@@ -11,4 +11,6 @@ add_subdirectory( nodes/root )
 add_subdirectory( nodes/trusted )
 add_subdirectory( nodes/org )
 
+add_subdirectory( clients/forge )
+
 add_subdirectory(testing)
