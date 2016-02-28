@@ -30,12 +30,14 @@ int main(int argc, char** argv) {
 	std::string content;
 	auto ptype = msgtype::gsn_register_host;
 	auto target = netspace_addr::from_string("127.0.0.1");
+	service_protocol proto = service_protocol::dvsp;
 	
 	po::options_description desc("Options");
 	desc.add_options()
 			("type",po::value<string>(),"Forge packet of type")
 			("target",po::value<string>(),"Change target machine")
 			("content",po::value<string>(),"String content")
+			("protocol",po::value<string>(),"Protocol (dvsp, http)")
 			("help","Display this message");
 	
 	po::variables_map vars;
@@ -62,7 +64,12 @@ int main(int argc, char** argv) {
 		content = vars["content"].as<string>();
 	}
 	
-	run_forge(ptype, target, content);
+	if(vars.count("protocol")) {
+		auto p = vars["protocol"].as<string>();
+		if(p == "http") proto = service_protocol::http;
+		else proto = service_protocol::dvsp;
+	}
+	run_forge(ptype, target, content, proto);
 	return 0;
 }
 
@@ -77,6 +84,8 @@ msgtype parse_msgtype(std::string str) {
 			return msgtype::gsn_local_area;
 		else if(str == "gtn_root_nodes")
 			return msgtype::gtn_root_nodes;
+		else if(str == "gsn_hostname")
+			return msgtype::gsn_hostname;
 		else
 			return msgtype::undefined;
 }

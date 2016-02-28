@@ -32,12 +32,32 @@ void view_frame_network(packet_uptr packet) {
 	std::cout << std::endl;
 }
 
-void forge_gsn_register_host(netspace_addr target, std::string& hostname) {
+void view_frame_hostname(packet_uptr packet) {
+	auto frame = packet->content_as<frame_hostname>();
+	std::cout 
+		<< "Response: " << rcode_to_string(frame.response) 
+		<< std::endl;
+	
+	if(frame.response != rcode::ok) {
+		std::cout << std::endl;
+		return;
+	}
+	std::string proto = "dvsp";
+	std::string hostname;
+	hostname.assign(frame.hostname.data(), frame.len);
+	
+	if(frame.protocol == service_protocol::http)
+		proto = "http";
+	
+	std::cout << hostname << ":" << proto << std::endl << std::endl;
+}
+
+void forge_gsn_register_host(netspace_addr target, std::string& hostname, service_protocol proto) {
 	packet_uptr p(new dvsp_packet);
 	p->header().addr_dest = target.to_v4().to_bytes();
 	p->header().size = 0;
 	p->header().type = msgtype::gsn_register_host;
-	auto frame = construct_frame_register(netnode_type::org, hostname);
+	auto frame = construct_frame_register(netnode_type::org, hostname, proto);
 	p->copy_content(&frame, sizeof(frame_register));
 	auto out = dispatch_packet(std::move(p));
 	view_frame_response(std::move(out));
@@ -61,11 +81,22 @@ void forge_gsn_local_area(netspace_addr target) {
 	view_frame_network(std::move(out));
 }
 
-void run_forge(dvsp_msgtype type, netspace_addr target, std::string content) {
+void forge_gsn_hostname(netspace_addr target, std::string content) {
+	packet_uptr p(new dvsp_packet);
+	p->header().addr_dest = target.to_v4().to_bytes();
+	p->header().size = 0;
+	p->header().type = msgtype::gsn_hostname;
+	auto addr = netspace_addr::from_string(content).to_v4().to_bytes();
+	p->copy_content(addr.data(), 4);
+	auto out = dispatch_packet(std::move(p));
+	view_frame_hostname(std::move(out));
+}
+
+void run_forge(dvsp_msgtype type, netspace_addr target, std::string content, service_protocol proto) {
 	switch(type) {
 		case msgtype::gsn_register_host:
 			std::cout << "Forging `gsn_register_host`... ";
-			forge_gsn_register_host(target, content);
+			forge_gsn_register_host(target, content, proto);
 			break;
 		case msgtype::gsn_unregister_host:
 			std::cout << "Forging `gsn_unregister_host`... ";
@@ -77,6 +108,10 @@ void run_forge(dvsp_msgtype type, netspace_addr target, std::string content) {
 			forge_gsn_local_area(target);
 			break;
 			
+		case msgtype::gsn_hostname:
+			std::cout << "Forging `gsn_local_area`... ";
+			forge_gsn_hostname(target, content);
+			break;
 		default:
 			std::cout << "Unimplemented frame" << std::endl; 
 			break;
