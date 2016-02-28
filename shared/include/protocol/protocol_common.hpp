@@ -11,6 +11,7 @@ enum class dvsp_msgtype : char {
 	gsn_resolution,
 	gsn_local_area,
 	gsn_root_nodes,
+	gsn_hostname,
 
 	gsn_request,
 	gsn_response,
@@ -32,15 +33,24 @@ enum class dvsp_rcode  : int {
 struct frame_register {
 	char type;
 	char len;
-	std::array<char, 62> hostname;
+	char protcol;
+	std::array<char, 125> hostname;
 };
 
 struct frame_response_code {
 	dvsp_rcode response;
 };
 
+struct frame_hostname {
+	dvsp_rcode response;
+	service_protocol protocol;
+	char len;
+	std::array<char, 125> hostname;
+};
+
 struct  __attribute__((packed)) frame_address {
 	dvsp_rcode response;
+	service_protocol protocol;
 	netspace_ipv4 addr;
 };
 
@@ -50,11 +60,12 @@ struct __attribute__((packed)) frame_network {
 	std::uint16_t size;
 };
 
-inline frame_register construct_frame_register(netnode_type type, std::string hostname) {
+inline frame_register construct_frame_register(netnode_type type, std::string hostname, service_protocol proto = service_protocol::dvsp) {
 	frame_register fr;
 
 	fr.type = static_cast<char>(type);
 	fr.len = hostname.length();
+	fr.protcol = static_cast<char>(proto);
 	hostname.copy(fr.hostname.data(), hostname.length());
 	return fr;
 };
@@ -65,10 +76,20 @@ inline frame_response_code construct_frame_response_code(dvsp_rcode code) {
 	return frc;
 }
 
-inline frame_address construct_frame_address(netspace_addr addr) {
+inline frame_address construct_frame_address(netspace_addr addr, service_protocol proto) {
 	frame_address f;
 	f.response = dvsp_rcode::ok;
+	f.protocol = proto;
 	f.addr = addr.to_v4().to_bytes();
+	return f;
+}
+
+inline frame_hostname construct_frame_hostname(std::string hostname, service_protocol proto) {
+	frame_hostname f;
+	f.response = dvsp_rcode::ok;
+	f.protocol = proto;
+	f.len = hostname.length();
+	std::copy(hostname.data(), hostname.data()+f.len, f.hostname.data());
 	return f;
 }
 
