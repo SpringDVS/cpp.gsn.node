@@ -16,16 +16,16 @@ TEST_CASE( "Test netspace_table ctors", "[shared],[netspace_table]" ) {
 TEST_CASE( "Test insertion" ) {
 	auto t = netspace_table();
 	
-	t.add_node(netnode());
+	t.add_node(netspace_node());
 	REQUIRE(t.size() == 1);
 	
-	t.add_node(netnode());
+	t.add_node(netspace_node());
 	REQUIRE(t.size() == 2);
 }
 
 TEST_CASE("Test netspace_table.clean/.empty", "[shared],[netspace_table]") {
 	auto t = netspace_table();
-	t.add_node(netnode());
+	t.add_node(netspace_node());
 	
 	REQUIRE_FALSE(t.empty());
 	t.clear();
@@ -34,7 +34,7 @@ TEST_CASE("Test netspace_table.clean/.empty", "[shared],[netspace_table]") {
 
 TEST_CASE("Test netspace_table.at", "[shared],[netspace_table]") {
 	auto t = netspace_table();
-	t.add_node(netnode(netnode_type::trusted));
+	t.add_node(netspace_node(netnode_type::trusted));
 	
 	auto n = t.at(0);
 	REQUIRE(n.type() == netnode_type::trusted);
@@ -46,7 +46,7 @@ TEST_CASE("Test netspace_table iterator", "[shared],[netspace_table]") {
 	auto t = netspace_table();
 	for(auto i = 0; i < 3; i++) {
 		auto nt = static_cast<netnode_type>(i);
-		t.add_node(netnode(nt));
+		t.add_node(netspace_node(nt));
 	}
 	
 	auto j = 0;
@@ -60,11 +60,11 @@ TEST_CASE("Test netspace_table iterator", "[shared],[netspace_table]") {
 TEST_CASE("Test netspace_table.find_addr", "[shared],[netspace_table]") {
 	auto t = netspace_table();
 	
-	t.add_node(netnode(netnode_type::org, 
+	t.add_node(netspace_node(netnode_type::org, 
 						"org",
 						"192.168.1.1"));
 
-	t.add_node(netnode(netnode_type::org, 
+	t.add_node(netspace_node(netnode_type::org, 
 						"org",
 						"192.168.1.2"));
 
@@ -96,11 +96,11 @@ TEST_CASE("Test netspace_table.find_addr", "[shared],[netspace_table]") {
 TEST_CASE("Test netspace_table.find_host", "[shared],[netspace_table]") {
 	auto t = netspace_table();
 	
-	t.add_node(netnode(netnode_type::org, 
+	t.add_node(netspace_node(netnode_type::org, 
 						"org_a",
 						"192.168.1.1"));
 
-	t.add_node(netnode(netnode_type::org, 
+	t.add_node(netspace_node(netnode_type::org, 
 						"org_b",
 						"192.168.1.2"));
 	
@@ -120,27 +120,27 @@ TEST_CASE("Test netspace_table.find_host", "[shared],[netspace_table]") {
 
 TEST_CASE("Test netspace_table.find_type", "[shared],[netspace_table]") {
 	auto t = netspace_table();
-	t.add_node(netnode(netnode_type::root, 
+	t.add_node(netspace_node(netnode_type::root, 
 						"root_a",
 						"192.168.1.1"));
 
-	t.add_node(netnode(netnode_type::org, 
+	t.add_node(netspace_node(netnode_type::org, 
 						"org_b",
 						"192.168.1.2"));
 	
-	t.add_node(netnode(netnode_type::org, 
+	t.add_node(netspace_node(netnode_type::org, 
 						"org_c",
 						"192.168.1.3"));
 	
-	t.add_node(netnode(netnode_type::org, 
+	t.add_node(netspace_node(netnode_type::org, 
 						"org_d",
 						"192.168.1.4"));
 
-	t.add_node(netnode(netnode_type::org, 
+	t.add_node(netspace_node(netnode_type::org, 
 						"org_e",
 						"192.168.1.5"));
 	
-	t.add_node(netnode(netnode_type::trusted, 
+	t.add_node(netspace_node(netnode_type::trusted, 
 						"trusted_f",
 						"192.168.1.6"));
 

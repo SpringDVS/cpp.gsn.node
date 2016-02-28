@@ -52,7 +52,7 @@ packet_uptr protocol_handler::register_host(const dvsp_packet& packet, const net
 	std::string hostname;
 	hostname.assign(st.hostname.data(), st.len);
 	
-	netnode n(static_cast<netnode_type>(st.type), hostname, addr.to_string());
+	netspace_node n(static_cast<netnode_type>(st.type), hostname, addr.to_string());
 	
 	m_nstable.add_node(n);
 	return response(dvsp_rcode::ok);

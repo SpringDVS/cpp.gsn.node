@@ -16,15 +16,15 @@
 #include "infrastructure/net_common.hpp"
 
 
-class netnode {
+class netspace_node {
 	
 public:
-	netnode();
-	netnode(netnode_type type);
-	netnode(netnode_type type, std::string host, std::string address);
-	netnode(netnode_type type, std::string host, netspace_addr address);
-	netnode(const netnode& orig);
-	virtual ~netnode();
+	netspace_node();
+	netspace_node(netnode_type type);
+	netspace_node(netnode_type type, std::string host, std::string address);
+	netspace_node(netnode_type type, std::string host, netspace_addr address);
+	netspace_node(const netspace_node& orig);
+	virtual ~netspace_node();
 	
 	netnode_type type();
 	void set_type(netnode_type t);

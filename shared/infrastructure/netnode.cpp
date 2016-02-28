@@ -13,50 +13,50 @@
 
 #include "infrastructure/netnode.hpp"
 
-netnode::netnode()
+netspace_node::netspace_node()
 	: m_type(netnode_type::undefined), m_addr(),  m_hostname() 
 { }
-netnode::netnode(netnode_type type)
+netspace_node::netspace_node(netnode_type type)
 	: m_type(type), m_addr(),  m_hostname() 
 { }
 
-netnode::netnode(netnode_type type, std::string host, std::string address) 
+netspace_node::netspace_node(netnode_type type, std::string host, std::string address) 
 	: m_type(type), m_addr(netspace_addr::from_string(address)), m_hostname(host)
 { }
 
-netnode::netnode(netnode_type type, std::string host, netspace_addr address) 
+netspace_node::netspace_node(netnode_type type, std::string host, netspace_addr address) 
 	: m_type(type), m_addr(address), m_hostname(host)
 { }
 
-netnode::netnode(const netnode& orig)
+netspace_node::netspace_node(const netspace_node& orig)
 	: m_type(orig.m_type), m_addr(orig.m_addr), m_hostname(orig.m_hostname)
 { }
 
-netnode::~netnode() 
+netspace_node::~netspace_node() 
 { }
 
 
-netnode_type netnode::type() {
+netnode_type netspace_node::type() {
 	return m_type;
 }
 
-void netnode::set_type(netnode_type t) {
+void netspace_node::set_type(netnode_type t) {
 	m_type = t;
 }
 
-const netspace_addr& netnode::address() const {
+const netspace_addr& netspace_node::address() const {
 	return m_addr;
 }
 
-void netnode::set_address(netspace_addr addr) {
+void netspace_node::set_address(netspace_addr addr) {
 	m_addr = addr;
 }
 
-std::string netnode::hostname() {
+std::string netspace_node::hostname() {
 	return m_hostname;
 }
 
-void netnode::set_hostname(std::string host) {
+void netspace_node::set_hostname(std::string host) {
 	m_hostname = host;
 }
 

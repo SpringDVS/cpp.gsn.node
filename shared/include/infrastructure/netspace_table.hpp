@@ -18,7 +18,7 @@
 #include "infrastructure/netnode.hpp"
 class netspace_table {
 public:
-	typedef std::vector<netnode> container_type;
+	typedef std::vector<netspace_node> container_type;
 	typedef container_type::size_type size_type;
 	typedef container_type::iterator iterator;
 	typedef container_type::const_iterator const_iterator;
@@ -28,7 +28,7 @@ public:
 	netspace_table(const netspace_table& orig);
 	virtual ~netspace_table();
 	
-	void add_node(const netnode& node) noexcept;
+	void add_node(const netspace_node& node) noexcept;
 	void erase_node(const_iterator it) noexcept;
 	
 	// Algos
@@ -41,7 +41,7 @@ public:
 	iterator find_type(netnode_type nt, iterator start);
 	
 	// container interface
-	netnode& at(size_type index);
+	netspace_node& at(size_type index);
 	size_type size() const;
 	bool empty() const;
 	void clear() noexcept;
@@ -51,7 +51,7 @@ public:
 	iterator end();
 private:
 	
-	std::vector<netnode> m_table;
+	std::vector<netspace_node> m_table;
 };
 
 #endif /* NETSPACE_HPP */

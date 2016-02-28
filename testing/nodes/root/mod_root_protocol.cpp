@@ -86,8 +86,8 @@ TEST_CASE("Test protocol_handler unregister (dynamic tables)", "[node],[root],[p
 	metaspace_gsn msgsn;
 	protocol_handler proto(nstable, msgsn);
 	
-	nstable.add_node(netnode(netnode_type::org, "dvs.test", "192.168.1.2"));
-	nstable.add_node(netnode(netnode_type::org, "dvs.test2", "192.168.1.3"));
+	nstable.add_node(netspace_node(netnode_type::org, "dvs.test", "192.168.1.2"));
+	nstable.add_node(netspace_node(netnode_type::org, "dvs.test2", "192.168.1.3"));
 	auto inbound_addr = netspace_addr::from_string("192.168.1.2");
 	
 
@@ -132,8 +132,8 @@ TEST_CASE("Test protocol_handler gsn resolution (dynamic tables)", "[node],[root
 	metaspace_gsn msgsn;
 	protocol_handler proto(nstable, msgsn);
 
-	nstable.add_node(netnode(netnode_type::root, "esusx", "192.168.1.3"));
-	nstable.add_node(netnode(netnode_type::org, "tst", "192.168.1.4"));
+	nstable.add_node(netspace_node(netnode_type::root, "esusx", "192.168.1.3"));
+	nstable.add_node(netspace_node(netnode_type::org, "tst", "192.168.1.4"));
 	auto inbound_addr = netspace_addr::from_string("192.168.1.2");
 
 	SECTION("Invalid resolution") {
@@ -179,8 +179,8 @@ TEST_CASE("Test protocol_handler resolution from gsn query (dynamic tables)", "[
 	metaspace_gsn msgsn;
 	protocol_handler proto(nstable, msgsn);
 
-	nstable.add_node(netnode(netnode_type::root, "esusx", "192.168.1.3"));
-	nstable.add_node(netnode(netnode_type::org, "tst", "192.168.1.4"));
+	nstable.add_node(netspace_node(netnode_type::root, "esusx", "192.168.1.3"));
+	nstable.add_node(netspace_node(netnode_type::org, "tst", "192.168.1.4"));
 	auto inbound_addr = netspace_addr::from_string("192.168.1.2");
 	
 	SECTION("Successful query") {
@@ -209,10 +209,10 @@ TEST_CASE("Test protocol_handler get nodes local/root (dynamic tables)", "[node]
 	metaspace_gsn msgsn;
 	protocol_handler proto(nstable, msgsn);
 
-	nstable.add_node(netnode(netnode_type::root, "root", "192.168.1.1"));
-	nstable.add_node(netnode(netnode_type::org, "org1", "192.168.1.6"));
-	nstable.add_node(netnode(netnode_type::org, "org2", "192.168.1.7"));
-	nstable.add_node(netnode(netnode_type::org, "org3", "192.168.1.8"));
+	nstable.add_node(netspace_node(netnode_type::root, "root", "192.168.1.1"));
+	nstable.add_node(netspace_node(netnode_type::org, "org1", "192.168.1.6"));
+	nstable.add_node(netspace_node(netnode_type::org, "org2", "192.168.1.7"));
+	nstable.add_node(netspace_node(netnode_type::org, "org3", "192.168.1.8"));
 	
 	
 	auto inbound_addr = netspace_addr::from_string("192.168.1.2");

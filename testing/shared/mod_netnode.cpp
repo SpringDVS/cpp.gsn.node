@@ -8,21 +8,21 @@
 #include "infrastructure/netnode.hpp"
 TEST_CASE( "Test netnode ctors", "[shared],[netnode]" ) {
 	SECTION("default") {
-		auto node = netnode();
+		auto node = netspace_node();
 		REQUIRE(node.type() == netnode_type::undefined);
 		REQUIRE(node.address() == netspace_addr());
 		REQUIRE(node.hostname() == std::string());
 	}
 	
 	SECTION("Typed") {
-		auto node = netnode(netnode_type::root);
+		auto node = netspace_node(netnode_type::root);
 		REQUIRE(node.type() == netnode_type::root);
 		REQUIRE(node.address() == netspace_addr());
 		REQUIRE(node.hostname() == std::string());
 	}
 	
 	SECTION("Type, String, String") {
-		auto node = netnode(netnode_type::root, 
+		auto node = netspace_node(netnode_type::root, 
 							"root_node", 
 							"192.168.1.1");
 		
@@ -33,7 +33,7 @@ TEST_CASE( "Test netnode ctors", "[shared],[netnode]" ) {
 	}
 	
 	SECTION("Type, String, netspace_addr") {
-		auto node = netnode(netnode_type::root, 
+		auto node = netspace_node(netnode_type::root, 
 							"root_node", 
 							netspace_addr::from_string("192.168.1.1"));
 		
