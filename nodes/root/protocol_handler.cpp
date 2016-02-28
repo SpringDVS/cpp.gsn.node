@@ -28,6 +28,8 @@ packet_uptr protocol_handler::process_packet(const dvsp_packet& packet, const ne
 			return local_gsn(packet);
 		case dvsp_msgtype::gtn_root_nodes:
 			return root_nodes(packet);
+		case dvsp_msgtype::gsn_hostname:
+			return hostname(packet);
 		default:
 			return response(dvsp_rcode::malformed_content);
 	}
@@ -88,7 +90,7 @@ packet_uptr protocol_handler::resolve_gsn(const dvsp_packet& packet) {
 		packet_uptr p(new dvsp_packet);
 		p->header() = packet.header();
 		p->header().type = dvsp_msgtype::gsn_response;
-		auto frame = construct_frame_address((*it).address());
+		auto frame = construct_frame_address((*it).address(), (*it).protocol());
 		
 		p->copy_content(&frame, sizeof(frame));
 		return p;
@@ -111,7 +113,7 @@ packet_uptr protocol_handler::resolve_gsn(const dvsp_packet& packet) {
 		packet_uptr p(new dvsp_packet);
 		p->header() = packet.header();
 		p->header().type = dvsp_msgtype::gsn_response;
-		auto frame = construct_frame_address((*it).address());
+		auto frame = construct_frame_address((*it).address(), (*it).protocol());
 		p->copy_content(&frame, sizeof(frame));
 		return p;
 	}
@@ -166,6 +168,20 @@ std::vector<netspace_ipv4> protocol_handler::nodes_of(netnode_type type) {
 	}
 	return nodes;
 }
+
+packet_uptr protocol_handler::hostname(const dvsp_packet& packet) {
+	auto addr = packet.content_as<netspace_ipv4>();
+	
+	auto it = m_nstable.find_addr(ipv4_to_netspace_addr(addr));
+	if(it == std::end(m_nstable)) return response(rcode::netspace_error);
+	auto node = *it;
+	packet_uptr p(new dvsp_packet);
+	p->header().type = dvsp_msgtype::gsn_response;
+	auto fh = construct_frame_hostname(node.hostname(), node.protocol());
+	p->copy_content(&fh, sizeof(fh));
+	return p;;
+}
+
 
 
 packet_uptr protocol_handler::response(dvsp_rcode code) {
