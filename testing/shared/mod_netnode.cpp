@@ -12,6 +12,7 @@ TEST_CASE( "Test netnode ctors", "[shared],[netnode]" ) {
 		REQUIRE(node.type() == netnode_type::undefined);
 		REQUIRE(node.address() == netspace_addr());
 		REQUIRE(node.hostname() == std::string());
+		REQUIRE(node.protocol() == service_protocol::dvsp);
 	}
 	
 	SECTION("Typed") {
@@ -19,6 +20,7 @@ TEST_CASE( "Test netnode ctors", "[shared],[netnode]" ) {
 		REQUIRE(node.type() == netnode_type::root);
 		REQUIRE(node.address() == netspace_addr());
 		REQUIRE(node.hostname() == std::string());
+		REQUIRE(node.protocol() == service_protocol::dvsp);
 	}
 	
 	SECTION("Type, String, String") {
@@ -30,6 +32,7 @@ TEST_CASE( "Test netnode ctors", "[shared],[netnode]" ) {
 		REQUIRE(node.type() == netnode_type::root);
 		REQUIRE(node.address() == netspace_addr::from_string("192.168.1.1"));
 		REQUIRE(node.hostname() == std::string("root_node"));
+		REQUIRE(node.protocol() == service_protocol::dvsp);
 	}
 	
 	SECTION("Type, String, netspace_addr") {
@@ -41,5 +44,19 @@ TEST_CASE( "Test netnode ctors", "[shared],[netnode]" ) {
 		REQUIRE(node.type() == netnode_type::root);
 		REQUIRE(node.address() == netspace_addr::from_string("192.168.1.1"));
 		REQUIRE(node.hostname() == std::string("root_node"));
+		REQUIRE(node.protocol() == service_protocol::dvsp);
+	}
+	
+	SECTION("Type, String, netspace_addr, service_protocol") {
+		auto node = netspace_node(netnode_type::root, 
+							"root_node", 
+							netspace_addr::from_string("192.168.1.1"),
+							service_protocol::http);
+		
+		
+		REQUIRE(node.type() == netnode_type::root);
+		REQUIRE(node.address() == netspace_addr::from_string("192.168.1.1"));
+		REQUIRE(node.hostname() == std::string("root_node"));
+		REQUIRE(node.protocol() == service_protocol::http);
 	}
 }

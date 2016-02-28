@@ -133,7 +133,7 @@ TEST_CASE("Test protocol_handler gsn resolution (dynamic tables)", "[node],[root
 	protocol_handler proto(nstable, msgsn);
 
 	nstable.add_node(netspace_node(netnode_type::root, "esusx", "192.168.1.3"));
-	nstable.add_node(netspace_node(netnode_type::org, "tst", "192.168.1.4"));
+	nstable.add_node(netspace_node(netnode_type::org, "tst", "192.168.1.4", service_protocol::http));
 	auto inbound_addr = netspace_addr::from_string("192.168.1.2");
 
 	SECTION("Invalid resolution") {
@@ -162,6 +162,7 @@ TEST_CASE("Test protocol_handler gsn resolution (dynamic tables)", "[node],[root
 		REQUIRE( out->header().type == msgtype::gsn_response );
 		REQUIRE( frame.response == rcode::ok );
 		REQUIRE( frame.addr == expected);
+		REQUIRE( frame.protocol == service_protocol::http);
 		
 	}
 	
@@ -246,5 +247,44 @@ TEST_CASE("Test protocol_handler get nodes local/root (dynamic tables)", "[node]
 		netspace_ipv4 addr = {{192,168,1,1}};
 		auto check = out->content_as<netspace_ipv4>(sizeof(frame_network) + 1);
 		REQUIRE(addr == check);
+	}
+}
+
+TEST_CASE("Test protocol_handler get hostname (dynamic tables)", "[node],[root],[protocol]") {
+	netspace_table nstable;
+	metaspace_gsn msgsn;
+	protocol_handler proto(nstable, msgsn);
+
+	nstable.add_node(netspace_node(netnode_type::root, "root", "192.168.1.1"));
+	nstable.add_node(netspace_node(netnode_type::org, "org1", "192.168.1.6"));
+	nstable.add_node(netspace_node(netnode_type::org, "org2", "192.168.1.7", service_protocol::http));
+	nstable.add_node(netspace_node(netnode_type::org, "org3", "192.168.1.8"));
+	
+	
+	auto inbound_addr = netspace_addr::from_string("192.168.1.2");
+	
+	SECTION("Successful hostname resolution") {
+		auto in = packet_of(dvsp_msgtype::gsn_hostname);
+		auto a = netspace_ipv4{{192,168,1,7}};
+		in.copy_content(a.data(), 4);
+		auto out = proto.process_packet(in, inbound_addr);
+		auto frame = out->content_as<frame_hostname>();
+		
+		REQUIRE(frame.response == rcode::ok);
+		REQUIRE(frame.protocol == service_protocol::http);
+		REQUIRE(frame.len == 4);
+		std::string hostname;
+		hostname.assign(frame.hostname.data(), frame.len);
+		REQUIRE(hostname == "org2");
+	}
+	
+	SECTION("Successful hostname resolution") {
+		auto in = packet_of(dvsp_msgtype::gsn_hostname);
+		auto a = netspace_ipv4{{192,168,1,50}};
+		in.copy_content(a.data(), 4);
+		auto out = proto.process_packet(in, inbound_addr);
+		auto frame = out->content_as<frame_hostname>();
+		
+		REQUIRE(frame.response == rcode::netspace_error);
 	}
 }
