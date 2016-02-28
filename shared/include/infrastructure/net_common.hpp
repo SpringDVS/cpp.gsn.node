@@ -21,6 +21,10 @@ enum class netnode_type : char {
 	undefined, root, org, trusted, georoot, _final
 };
 
+enum class service_protocol : char {
+	dvsp, http
+};
+
 
 using netspace_addr = boost::asio::ip::address;
 using netspace_ipv4 = boost::asio::detail::array<std::uint8_t, 4>;
