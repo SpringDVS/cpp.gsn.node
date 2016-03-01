@@ -12,6 +12,7 @@ set( SOURCES
         infrastructure/metaspace_gsn.cpp
 
         protocol/dvsp_packet.cpp
+        protocol/http_frame.cpp
 )
 
 add_library( springdvs SHARED ${SOURCES} )
