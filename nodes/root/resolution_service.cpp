@@ -20,7 +20,6 @@ resolution_service::~resolution_service() {
 }
 
 void resolution_service::start_recv() {
-	std::cout << "Session Reading" << std::endl;
 	m_socket.async_receive_from(
 		boost::asio::buffer(&m_recv, 1024), m_remote_ep,
 		boost::bind(
@@ -33,7 +32,7 @@ void resolution_service::start_recv() {
 
 void resolution_service::receive(const boost::system::error_code& error, std::size_t) {
 	if(error) return;
-
+	std::cout << "Receiving UDP data" << std::endl;
 	dvsp_packet in(m_recv);
 	auto inbound_addr = m_remote_ep.address();
 	auto out = m_proto.process_packet(in, inbound_addr);

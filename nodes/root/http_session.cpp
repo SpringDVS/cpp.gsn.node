@@ -19,7 +19,12 @@ void http_session::read() {
 	m_socket.async_read_some(boost::asio::buffer(m_data, max_size),
 		[this, self](boost::system::error_code e, std::size_t) {
 			if(e) return;
-			std::cout << "Recv packet data" << std::endl;
+			std::cout << "Receiving HTTP data:" << std::endl;
+			for(auto i = 0; i < 100; i++) {
+				std::cout << m_data[i];
+			}
+			
+			std::cout << std::endl;
 			//m_handler.process_packet(dvsp_packet(m_data), m_socket.remote_endpoint().address());
 		});
 }
