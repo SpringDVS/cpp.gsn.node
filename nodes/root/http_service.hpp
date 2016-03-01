@@ -1,11 +1,14 @@
 #ifndef HTTP_SERVICE_HPP
 #define HTTP_SERVICE_HPP
 #include "protocol/http_frame.hpp"
+#include "infrastructure/metaspace_gsn.hpp"
+#include "infrastructure/netspace_table.hpp"
+#include "protocol_handler.hpp"
 #include<cstdio>
 class http_service {
 public:
-	http_service();
-	http_service(const http_service& orig);
+	http_service(netspace_ios& service, netspace_table& nstable, metaspace_gsn& msgsn);
+	http_service(const http_service&) = delete;
 	~http_service();
 	
 	static void send_frame(const http_frame& frame, netspace_ipv4 address){
@@ -51,7 +54,15 @@ public:
 		}
 	};
 private:
-
+	
+	netspace_tcp::acceptor m_acceptor;
+	netspace_tcp::socket m_socket;
+	
+	netspace_table& m_nstable;
+	metaspace_gsn& m_msgsn;
+	protocol_handler m_handler;
+	
+	void do_accept();
 };
 
 #endif /* HTTP_SERVICE_HPP */

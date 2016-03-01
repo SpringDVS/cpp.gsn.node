@@ -2,6 +2,7 @@ project( lnroot )
 set( SOURCES
     protocol_handler.cpp
     resolution_service.cpp
+    http_session.cpp
     http_service.cpp
     entry.cpp )
 

@@ -1,6 +1,7 @@
 #include <iostream>
 #include <chrono>
 #include "resolution_service.hpp"
+#include "http_service.hpp"
 //#include "infrastructure/netspace_table.hpp"
 //#include "infrastructure/metaspace_gsn.hpp"
 using namespace std::chrono;
@@ -11,6 +12,7 @@ int main() {
 	try {
 		netspace_ios ios;
 		resolution_service rn(ios, nstable, msgsn);
+		http_service hs(ios, nstable, msgsn);
 		ios.run();
 	} catch(std::exception& e) {
 		std::cout << "E: " << e.what() << std::endl;
