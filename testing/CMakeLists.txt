@@ -26,5 +26,5 @@ set( SRC_NODES
 set( SOURCES entry.cpp ${SRC_SHARED} ${SRC_NODES} )
 
 add_executable(  catch_lnp ${SOURCES} )
-target_link_libraries( catch_lnp springdvs )
+target_link_libraries( catch_lnp springdvs pthread )
 
