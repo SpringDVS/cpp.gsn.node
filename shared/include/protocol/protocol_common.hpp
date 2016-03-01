@@ -30,7 +30,7 @@ enum class dvsp_rcode  : int {
 	fake_udp = 505,
 };
 
-struct frame_register {
+struct  __attribute__((packed)) frame_register {
 	char type;
 	char len;
 	char protcol;
@@ -41,7 +41,7 @@ struct frame_response_code {
 	dvsp_rcode response;
 };
 
-struct frame_hostname {
+struct  __attribute__((packed)) frame_hostname {
 	dvsp_rcode response;
 	service_protocol protocol;
 	char len;

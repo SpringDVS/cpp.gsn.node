@@ -2,9 +2,9 @@
 #define DVSP_PACKET_HPP
 #include "protocol_common.hpp"
 
-struct dvsp_header {
+struct __attribute__((packed)) dvsp_header {
 	dvsp_msgtype type;
-	bool part;
+	std::uint8_t part;
 	std::uint32_t size;
 	netspace_ipv4 addr_orig;
 	netspace_ipv4 addr_dest;
