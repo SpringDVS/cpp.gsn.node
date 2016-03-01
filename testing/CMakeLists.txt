@@ -21,7 +21,6 @@ set( SRC_SHARED
 
 set( SRC_NODES
     nodes/root/mod_root_protocol.cpp 
-    nodes/root/mod_node_root.cpp 
 )
 set( SOURCES entry.cpp ${SRC_SHARED} ${SRC_NODES} )
 
