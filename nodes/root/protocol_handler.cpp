@@ -1,4 +1,5 @@
 #include "protocol_handler.hpp"
+#include "http_service.hpp"
 
 using rcode = dvsp_rcode;
 
@@ -30,6 +31,8 @@ packet_uptr protocol_handler::process_packet(const dvsp_packet& packet, const ne
 			return root_nodes(packet);
 		case dvsp_msgtype::gsn_hostname:
 			return hostname(packet);
+		case dvsp_msgtype::gsn_request:
+			return query(packet);
 		default:
 			return response(dvsp_rcode::malformed_content);
 	}
@@ -192,3 +195,18 @@ packet_uptr protocol_handler::response(dvsp_rcode code) {
 	p->copy_content(&frc, sizeof(frame_response_code));
 	return p;
 }
+
+packet_uptr protocol_handler::query(const dvsp_packet& packet) {
+	auto in = packet;
+	for(auto& node : m_nstable) {
+		in.header().addr_dest = node.address().to_v4().to_bytes();
+		
+		if(node.protocol() == service_protocol::http) {
+			auto frame = http_frame(in, node.hostname());
+			http_service::send_frame(frame, in.header().addr_dest);
+		}
+	}
+	
+	return response(rcode::ok);
+}
+

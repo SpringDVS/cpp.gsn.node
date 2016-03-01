@@ -3,6 +3,12 @@
 using nsudp = netspace_udp; // gsn resolution service
 using berror = boost::system::error_code;
 
+#define DUMP_PACKET(fname, ptr)										\
+		FILE *fp = fopen(fname, "wb");								\
+		auto slen = reinterpret_cast<dvsp_header*>(ptr)->size;		\
+		fwrite(ptr, 1, sizeof(dvsp_header)+slen, fp);				\
+		fclose(fp);
+
 resolution_service::resolution_service(netspace_ios& ios, netspace_table& nstable, metaspace_gsn& msgsn)
 	: m_socket(ios, nsudp::endpoint(nsudp::v4(), GSN_SERVICE_PORT))
 	, m_nstable(nstable)
@@ -14,6 +20,7 @@ resolution_service::~resolution_service() {
 }
 
 void resolution_service::start_recv() {
+	std::cout << "Session Reading" << std::endl;
 	m_socket.async_receive_from(
 		boost::asio::buffer(&m_recv, 1024), m_remote_ep,
 		boost::bind(

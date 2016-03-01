@@ -28,6 +28,8 @@ private:
 	
 	packet_uptr hostname(const dvsp_packet& packet);
 	
+	packet_uptr query(const dvsp_packet& packet);
+	
 	std::vector<netspace_ipv4> nodes_of(netnode_type type);
 	
 	packet_uptr response(dvsp_rcode code);
