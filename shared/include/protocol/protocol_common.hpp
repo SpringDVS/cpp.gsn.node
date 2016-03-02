@@ -2,7 +2,8 @@
 #define PROTOCOL_COMMON_HPP
 
 #include "infrastructure/net_common.hpp"
-#include "dvsp_packet.hpp"
+#include "infrastructure/netnode.hpp"
+
 
 enum class dvsp_msgtype : char {
 	undefined,
@@ -23,10 +24,13 @@ enum class dvsp_msgtype : char {
 	management_echo,
 };
 
+#include "dvsp_packet.hpp"
+
 enum class dvsp_rcode  : int {
 	netspace_error = 101,
 	network_error = 102,
 	malformed_content = 103,
+	netspace_duplicate = 104,
 	ok = 200,
 	fake_udp = 505,
 };
@@ -112,21 +116,19 @@ inline frame_hostname construct_frame_hostname(std::string hostname, service_pro
 	return f;
 }
 
-inline frame_network* construct_frame_network(const std::vector<netspace_ipv4>& nodes) {
-	auto sz = sizeof(frame_network) + (nodes.size()*4)+1;
-	auto heap = new std::uint8_t[sz];
-	auto f = reinterpret_cast<frame_network*>(heap);
-
-	f->response = dvsp_rcode::ok;
-	f->total = nodes.size();
-	f->size = sz;
-	auto ptr = heap + sizeof(frame_network)+1;
+inline std::string construct_frame_network(std::vector<netspace_node>& nodes) {
 	
+	std::stringstream ss;
+		
 	for(auto& n : nodes) {
-		std::copy(n.data(), n.data()+4, ptr);
-		ptr += 4;
+		ss 
+			<< n.hostname() << "|" 
+			<< n.suid() << "|"
+			<< n.address().to_string() << ";";
 	}
-	return f;
+	
+	return ss.str();
+
 }
 
 inline std::unique_ptr<char[]> http_to_bin(char* http) {
@@ -146,6 +148,22 @@ inline std::unique_ptr<char[]> http_to_bin(char* http) {
 		bytes[i++] = strtol(d, NULL,16);
 	}
 	return std::unique_ptr<char[]>(bytes);
+}
+
+inline std::vector<netspace_node> nodes_from_string(std::string details) {
+	std::string tmp;
+	int offset = 0;
+	std::vector<netspace_node> nodes;
+	for(auto i = 0u; i < details.length(); i++) {
+		auto ch = details[i];
+		if(ch == ';') {
+			auto ns = details.substr(offset, i);
+			offset = i;
+			if(ns.length()) nodes.push_back(netspace_node(ns));
+		}
+	}
+	
+	return nodes;
 }
 #endif /* PROTOCOL_COMMON_HPP */
 
