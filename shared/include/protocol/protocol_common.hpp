@@ -2,6 +2,7 @@
 #define PROTOCOL_COMMON_HPP
 
 #include "infrastructure/net_common.hpp"
+#include "dvsp_packet.hpp"
 
 enum class dvsp_msgtype : char {
 	undefined,
@@ -33,7 +34,7 @@ enum class dvsp_rcode  : int {
 struct  __attribute__((packed)) frame_register {
 	char type;
 	char len;
-	char protcol;
+	char protocol;
 	std::array<char, 125> hostname;
 };
 
@@ -60,12 +61,30 @@ struct __attribute__((packed)) frame_network {
 	std::uint16_t size;
 };
 
+struct __attribute__((packed)) frame_service {
+	dvsp_rcode response;
+	char len;
+};
+
+inline frame_service* construct_frame_service(std::string result) {
+	auto sz = sizeof(frame_service) + result.length();
+	auto heap = new std::uint8_t[sz];
+	auto f = reinterpret_cast<frame_service*>(heap);	
+	
+	f->response = dvsp_rcode::ok;
+	f->len = result.length();
+	auto offset = heap + sizeof(frame_service);
+	auto ptr = reinterpret_cast<char*>(offset);
+	result.assign(ptr);
+	return f;
+}
+
 inline frame_register construct_frame_register(netnode_type type, std::string hostname, service_protocol proto = service_protocol::dvsp) {
 	frame_register fr;
 
 	fr.type = static_cast<char>(type);
 	fr.len = hostname.length();
-	fr.protcol = static_cast<char>(proto);
+	fr.protocol = static_cast<char>(proto);
 	hostname.copy(fr.hostname.data(), hostname.length());
 	return fr;
 };
@@ -108,6 +127,25 @@ inline frame_network* construct_frame_network(const std::vector<netspace_ipv4>& 
 		ptr += 4;
 	}
 	return f;
+}
+
+inline std::unique_ptr<char[]> http_to_bin(char* http) {
+	auto r = std::string(http);		
+	auto n = r.find("\r\n\r\n");
+	auto split = r.substr(n+4);
+	
+	auto len = split.length();
+	auto final_len = len/2;
+
+	auto bytes = new char[final_len];
+	auto i = 0;
+	for(auto j = 0u; j < len; j++) {
+		char d[2];
+		d[0] = split[j++];
+		d[1] = split[j];
+		bytes[i++] = strtol(d, NULL,16);
+	}
+	return std::unique_ptr<char[]>(bytes);
 }
 #endif /* PROTOCOL_COMMON_HPP */
 
