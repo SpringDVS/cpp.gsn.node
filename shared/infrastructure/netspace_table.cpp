@@ -47,7 +47,6 @@ netspace_table::iterator netspace_table::find_type(netnode_type nt, iterator sta
 	});
 }
 
-
 netspace_node& netspace_table::at(size_type index) {
 	if(index >= m_table.size()) throw std::out_of_range("Index out of range");
 	
@@ -75,5 +74,8 @@ netspace_table::iterator netspace_table::end() {
 	return m_table.end();
 }
 
-
-
+netspace_table::iterator netspace_table::find_suid(const std::string& suid) noexcept {
+	return std::find_if(std::begin(m_table), std::end(m_table), [&suid](netspace_node& v) {
+		return v.suid() == suid;
+	});
+}

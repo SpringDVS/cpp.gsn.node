@@ -40,6 +40,8 @@ public:
 	iterator find_type(netnode_type nt);
 	iterator find_type(netnode_type nt, iterator start);
 	
+	iterator find_suid(const std::string& suid) noexcept;
+	
 	// container interface
 	netspace_node& at(size_type index);
 	size_type size() const;
