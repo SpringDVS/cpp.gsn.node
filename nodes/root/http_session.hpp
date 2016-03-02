@@ -14,9 +14,9 @@ public:
 	
 	void start();
 private:
-	enum { max_size = 1024 };
+	enum { max_size = 2048 };
 	netspace_tcp::socket m_socket;
-	serial_type m_data[1024];
+	serial_type m_data[2048];
 	protocol_handler& m_handler;
 	
 	

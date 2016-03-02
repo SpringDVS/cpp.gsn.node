@@ -18,14 +18,15 @@ void http_session::read() {
 	auto self(shared_from_this());
 	m_socket.async_read_some(boost::asio::buffer(m_data, max_size),
 		[this, self](boost::system::error_code e, std::size_t) {
-			if(e) return;
-			std::cout << "Receiving HTTP data:" << std::endl;
-			for(auto i = 0; i < 100; i++) {
-				std::cout << m_data[i];
-			}
+			if(e) return;			
 			
-			std::cout << std::endl;
-			//m_handler.process_packet(dvsp_packet(m_data), m_socket.remote_endpoint().address());
+			auto bytes = http_to_bin(m_data);			
+			dump_frames("http_shim.raw", bytes.get());
+			auto inbound_addr = m_socket.remote_endpoint().address();
+			auto frame = m_handler.process_packet(dvsp_packet(bytes.get()), inbound_addr);
+			auto serial = frame->serialise();
+			boost::asio::write(m_socket, boost::asio::buffer(serial, frame->size()));
+			delete serial;
 		});
 }
 
@@ -34,7 +35,7 @@ void http_session::write(std::size_t length) {
 	boost::asio::async_write(m_socket, boost::asio::buffer(m_data, length),
 	[this, self](boost::system::error_code e, std::size_t) {
 		if(!e) {
-			read();
+			m_socket.close();
 		}
 	});
 }
