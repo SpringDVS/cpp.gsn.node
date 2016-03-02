@@ -37,12 +37,16 @@ public:
 	
 	service_protocol protocol();
 	void set_protocol(service_protocol proto);
+	
+	void set_suid(std::string suid);
+	std::string suid();
 private:
 
 	netnode_type m_type;
 	netspace_addr m_addr;
 	std::string m_hostname;
 	service_protocol m_proto;
+	std::string m_suid;
 };
 
 #endif /* NETNODE_HPP */

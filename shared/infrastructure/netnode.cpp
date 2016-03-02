@@ -30,6 +30,7 @@ netspace_node::netspace_node(netnode_type type, std::string host, netspace_addr 
 
 netspace_node::netspace_node(const netspace_node& orig)
 	: m_type(orig.m_type), m_addr(orig.m_addr), m_hostname(orig.m_hostname), m_proto(orig.m_proto)
+	, m_suid(orig.m_suid)
 { }
 
 netspace_node::~netspace_node() 
@@ -67,6 +68,15 @@ service_protocol netspace_node::protocol() {
 void netspace_node::set_protocol(service_protocol proto) {
 	m_proto = proto;
 }
+void netspace_node::set_suid(std::string suid) {
+	m_suid = suid;
+}
+
+std::string netspace_node::suid() {
+	return m_suid;
+}
+
+
 
 
 
