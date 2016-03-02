@@ -45,9 +45,6 @@ packet_uptr protocol_handler::register_host(const dvsp_packet& packet, const net
 	//if(addr.to_v4().to_bytes() != packet.header().addr_orig)
 	//	return response(dvsp_rcode::network_error); // Network error
 	
-	if(m_nstable.find_addr(addr.to_string()) != m_nstable.end())
-		return response(dvsp_rcode::netspace_error); // Table error
-
 	//auto st = reinterpret_cast<const frame_register&>(packet.content());
 	auto st = packet.content_as<frame_register>();
 	
@@ -60,7 +57,13 @@ packet_uptr protocol_handler::register_host(const dvsp_packet& packet, const net
 	hostname = tmp.substr(0, i++);
 	suid = tmp.substr(i);
 	std::cout << hostname << " | " << suid << std::endl;
+
+	if(m_nstable.find_host(hostname) != m_nstable.end())
+		return response(dvsp_rcode::netspace_duplicate); // Table duplication
 	
+	if(m_nstable.find_suid(suid) != m_nstable.end())
+		return response(dvsp_rcode::netspace_duplicate); // Table duplication
+
 	
 	netspace_node n(static_cast<netnode_type>(st.type), hostname, addr.to_string(), static_cast<service_protocol>(st.protocol));
 	n.set_suid(suid);
@@ -148,31 +151,33 @@ packet_uptr protocol_handler::query_gsn(const dvsp_packet& packet) {
 
 packet_uptr protocol_handler::local_gsn(const dvsp_packet& packet) {
 	auto nodes = nodes_of(netnode_type::org);
-	auto ptr = construct_frame_network(nodes);
+	auto value = construct_frame_network(nodes);
 	packet_uptr p(new dvsp_packet);
 	p->header() = packet.header();
 	p->header().type = dvsp_msgtype::gsn_response;
-	p->copy_content(ptr, ptr->size);
-	delete[] ptr;
+	//p->copy_content(ptr, ptr->size);
+	p->str_content(value);
+	//delete[] ptr;
 	return p;
 }
 
 packet_uptr protocol_handler::root_nodes(const dvsp_packet& packet) {
 	auto nodes = nodes_of(netnode_type::root);
-	auto ptr = construct_frame_network(nodes);
+	auto value = construct_frame_network(nodes);
 	packet_uptr p(new dvsp_packet);
 	p->header() = packet.header();
 	p->header().type = dvsp_msgtype::gsn_response;
-	p->copy_content(ptr, ptr->size);
-	delete[] ptr;
+	p->str_content(value);
+	//p->copy_content(ptr, ptr->size);
+	//delete[] ptr;
 	return p;
 }
 
-std::vector<netspace_ipv4> protocol_handler::nodes_of(netnode_type type) {
-	std::vector<netspace_ipv4> nodes;
+std::vector<netspace_node> protocol_handler::nodes_of(netnode_type type) {
+	std::vector<netspace_node> nodes;
 	for(auto& n : m_nstable) {
 		if(n.type() == type)
-			nodes.push_back(n.address().to_v4().to_bytes());
+			nodes.push_back(n);
 	}
 	return nodes;
 }

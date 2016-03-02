@@ -32,7 +32,7 @@ private:
 	std::string query_all(dvsp_packet packet, std::string query);
 	std::string query_one(dvsp_packet packet, std::string suid, std::string query);
 	
-	std::vector<netspace_ipv4> nodes_of(netnode_type type);
+	std::vector<netspace_node> nodes_of(netnode_type type);
 	
 	packet_uptr response(dvsp_rcode code);
 };
