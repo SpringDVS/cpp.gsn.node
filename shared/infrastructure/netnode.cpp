@@ -33,6 +33,29 @@ netspace_node::netspace_node(const netspace_node& orig)
 	, m_suid(orig.m_suid)
 { }
 
+netspace_node::netspace_node(std::string entry)
+: m_type(netnode_type::undefined), m_addr(), m_hostname(), m_proto() 
+{
+
+	auto offset = 0;
+	char state = 0;
+	for(auto i = 0u; i < entry.length(); i++) {
+		if(entry[i] == '|') {		
+			if(state == 0) {
+				m_suid = entry.substr(offset, i);
+				offset = ++i;
+			} else if(state == 1) {
+				m_hostname = entry.substr(offset, i-offset);
+				offset = ++i;
+				m_addr = netspace_addr::from_string(entry.substr(i));
+				break;
+			}
+			state++;
+		}
+	}
+	
+}
+
 netspace_node::~netspace_node() 
 { }
 

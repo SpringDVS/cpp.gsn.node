@@ -23,6 +23,8 @@ public:
 	netspace_node(netnode_type type, service_protocol proto = service_protocol::dvsp);
 	netspace_node(netnode_type type, std::string host, std::string address, service_protocol proto = service_protocol::dvsp);
 	netspace_node(netnode_type type, std::string host, netspace_addr address, service_protocol proto = service_protocol::dvsp);
+	netspace_node(std::string entry);
+	
 	netspace_node(const netspace_node& orig);
 	virtual ~netspace_node();
 	
