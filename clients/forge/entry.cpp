@@ -86,6 +86,8 @@ msgtype parse_msgtype(std::string str) {
 			return msgtype::gtn_root_nodes;
 		else if(str == "gsn_hostname")
 			return msgtype::gsn_hostname;
+		else if(str == "gsn_request")
+			return msgtype::gsn_request;
 		else
 			return msgtype::undefined;
 }

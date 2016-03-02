@@ -78,6 +78,18 @@ void forge_gsn_local_area(netspace_addr target) {
 	p->header().size = 0;
 	p->header().type = msgtype::gsn_local_area;
 	auto out = dispatch_packet(std::move(p));
+	view_frame_response(std::move(out));
+}
+
+
+
+void forge_gsn_request(netspace_addr target, std::string content) {
+	packet_uptr p(new dvsp_packet);
+	p->header().addr_dest = target.to_v4().to_bytes();
+	p->header().size = 0;
+	p->header().type = msgtype::gsn_request;
+	p->str_content(content);
+	auto out = dispatch_packet(std::move(p));
 	view_frame_network(std::move(out));
 }
 
@@ -111,6 +123,10 @@ void run_forge(dvsp_msgtype type, netspace_addr target, std::string content, ser
 		case msgtype::gsn_hostname:
 			std::cout << "Forging `gsn_local_area`... ";
 			forge_gsn_hostname(target, content);
+			break;
+		case msgtype::gsn_request:
+			std::cout << "Forging `gsn_request`... ";
+			forge_gsn_request(target, content);
 			break;
 		default:
 			std::cout << "Unimplemented frame" << std::endl; 
