@@ -54,11 +54,16 @@ packet_uptr protocol_handler::register_host(const dvsp_packet& packet, const net
 	if(st.type >= static_cast<char>(netnode_type::_final))
 		return response(dvsp_rcode::malformed_content); // Malformed content
 	
-	std::string hostname;
-	hostname.assign(st.hostname.data(), st.len);
+	std::string hostname, suid, tmp;
+	tmp.assign(st.hostname.data(), st.len);
+	auto i = tmp.find('|');
+	hostname = tmp.substr(0, i++);
+	suid = tmp.substr(i);
+	std::cout << hostname << " | " << suid << std::endl;
 	
-	netspace_node n(static_cast<netnode_type>(st.type), hostname, addr.to_string(), static_cast<service_protocol>(st.protcol));
 	
+	netspace_node n(static_cast<netnode_type>(st.type), hostname, addr.to_string(), static_cast<service_protocol>(st.protocol));
+	n.set_suid(suid);
 	m_nstable.add_node(n);
 	return response(dvsp_rcode::ok);
 }
@@ -198,15 +203,83 @@ packet_uptr protocol_handler::response(dvsp_rcode code) {
 
 packet_uptr protocol_handler::query(const dvsp_packet& packet) {
 	auto in = packet;
-	for(auto& node : m_nstable) {
-		in.header().addr_dest = node.address().to_v4().to_bytes();
-		
-		if(node.protocol() == service_protocol::http) {
-			auto frame = http_frame(in, node.hostname());
-			http_service::send_frame(frame, in.header().addr_dest);
-		}
+	std::stringstream ss;
+	auto url = netspace_url(packet.to_string());
+	std::cout << "Front: " << url.static_route().front() << std::endl;
+	if(url.static_route().front() == "esusx") {
+		ss << query_all(packet, url.query());
+	} else {
+		ss << query_one(packet, url.static_route().front(), url.query());
 	}
 	
-	return response(rcode::ok);
+	packet_uptr out(new dvsp_packet);
+	out->header().type = dvsp_msgtype::gsn_response;
+	out->str_content(ss.str());
+	dump_frames("frame_dump.raw", out->serialise());
+	return out;
 }
+
+std::string protocol_handler::query_one(dvsp_packet packet, std::string suid, std::string query) {
+	std::stringstream ss;
+	auto it = m_nstable.find_suid(suid);
+	
+	if(it == std::end(m_nstable)) {
+		std::cout << "Invalid suid: " << suid << std::endl;
+		return ss.str();
+	}
+	auto node = *it;
+	packet.str_content(query);
+	auto frame = http_frame(packet, node.hostname());
+	packet.header().addr_dest = node.address().to_v4().to_bytes();
+	std::cout << "Single Destination: " << ipv4_to_string(packet.header().addr_dest) << std::endl;
+	auto recv = http_service::send_frame(frame, packet.header().addr_dest);
+	
+	if(recv.header().type == dvsp_msgtype::gsn_response) {
+		auto fs = recv.content_as<frame_service>();
+		if(fs.response == dvsp_rcode::ok) {
+			auto str = recv.to_string(sizeof(frame_service));
+			std::cout << str << std::endl;
+			ss << str;
+		} 
+	}
+	return ss.str();
+}
+
+std::string protocol_handler::query_all(dvsp_packet packet, std::string query) {
+	std::stringstream ss;
+	
+	bool first = true;
+	
+	for(auto& node : m_nstable) {
+		packet.str_content(query);
+		packet.header().addr_dest = node.address().to_v4().to_bytes();
+		dump_frames("outbound.raw", packet.serialise());
+
+		if(node.protocol() == service_protocol::http) {
+			auto frame = http_frame(packet, node.hostname());
+		
+			std::cout << "Part Destination: " << ipv4_to_string(packet.header().addr_dest) << std::endl;
+			auto recv = http_service::send_frame(frame, packet.header().addr_dest);
+
+			if(recv.header().type == dvsp_msgtype::gsn_response) {
+				auto fs = recv.content_as<frame_service>();
+				if(fs.response == dvsp_rcode::ok) {
+					
+					if(!first) ss << "::";
+					else first = false;
+					
+					auto str = recv.to_string(sizeof(frame_service));
+					std::cout << str << std::endl;
+					ss << str;
+				} else {
+					continue;
+				}
+			}
+
+		}
+	}
+	return ss.str();
+}
+
+
 

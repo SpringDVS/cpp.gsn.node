@@ -29,6 +29,8 @@ private:
 	packet_uptr hostname(const dvsp_packet& packet);
 	
 	packet_uptr query(const dvsp_packet& packet);
+	std::string query_all(dvsp_packet packet, std::string query);
+	std::string query_one(dvsp_packet packet, std::string suid, std::string query);
 	
 	std::vector<netspace_ipv4> nodes_of(netnode_type type);
 	
