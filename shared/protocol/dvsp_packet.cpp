@@ -38,12 +38,13 @@ const dvsp_packet::generic_type& dvsp_packet::content() const {
 	return *m_content;
 }
 
-std::string dvsp_packet::to_string() const {
+std::string dvsp_packet::to_string(size_type offset) const {
 	if(!m_header.size
 	|| (m_header.size && !m_content ) )
 		throw dvsp_empty_content();
+	
 	std::string s;
-	s.assign(reinterpret_cast<const char*>(m_content), m_header.size);
+	s.assign(reinterpret_cast<const char*>(m_content+offset), (m_header.size-offset));
 	return s;
 }
 

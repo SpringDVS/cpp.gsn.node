@@ -18,6 +18,10 @@ struct __attribute__((packed)) dvsp_header {
 		{ }
 };
 
+inline const dvsp_header& extract_header(const char* bytes) {
+	return *reinterpret_cast<const dvsp_header*>(bytes);
+}
+
 inline std::string ns_ipv4_str(const netspace_ipv4& addr) {
 	std::stringstream ss;
 	ss	<< std::to_string(addr[0]) 
@@ -64,7 +68,7 @@ public:
 		return reinterpret_cast<const T&>(*(m_content+offset));
 	};
 	
-	std::string to_string() const;
+	std::string to_string(size_type offset = 0) const;
 	
 	serial_ptr serialise() const;
 	size_type size() const;
@@ -86,6 +90,14 @@ private:
 	};
 
 };
+
+inline void dump_frames(std::string fn, const char* bytes) {
+		FILE *fp = fopen(fn.c_str(), "wb");						
+		auto sz = extract_header(bytes).size;
+		fwrite(bytes, 1, sizeof(dvsp_header)+sz, fp);
+		fclose(fp);
+}
+
 
 using packet_uptr = std::unique_ptr<dvsp_packet>;
 #endif /* DVSP_PACKET_HPP */
