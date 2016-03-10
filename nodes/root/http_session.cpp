@@ -19,8 +19,7 @@ void http_session::read() {
 	m_socket.async_read_some(boost::asio::buffer(m_data, max_size),
 		[this, self](boost::system::error_code e, std::size_t) {
 			if(e) return;			
-			
-			auto bytes = http_to_bin(m_data);			
+			auto bytes = http_to_bin(m_data);
 			dump_frames("http_shim.raw", bytes.get());
 			auto inbound_addr = m_socket.remote_endpoint().address();
 			auto frame = m_handler.process_packet(dvsp_packet(bytes.get()), inbound_addr);

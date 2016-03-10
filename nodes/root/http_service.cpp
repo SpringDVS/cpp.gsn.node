@@ -3,7 +3,7 @@
 using tcp = netspace_tcp;
 using ecode = boost::system::error_code;
 http_service::http_service(netspace_ios& service, netspace_table& nstable, metaspace_gsn& msgsn)
-	: m_acceptor(service, tcp::endpoint(tcp::v4(), 80))
+	: m_acceptor(service, tcp::endpoint(tcp::v4(), 55380))
 	, m_socket(service)
 	, m_nstable(nstable)
 	, m_msgsn(msgsn)
